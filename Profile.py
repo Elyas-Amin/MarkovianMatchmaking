@@ -5,11 +5,11 @@ class Profile:
         self.religion = religion
         self.location = location
         self.zodiac = zodiac
-        self.education__level = education_level
+        self.education_level = education_level
         self.tags = {}
-        self.comptability = {}
+        self.compatibility = {}
         
-    def compute_compatabilty(self, match: Profile):
+    def compute_compatibility(self, match: Profile):
         tags_score = len(self.tags.union(match.tags))
         score = tags_score
         return score
