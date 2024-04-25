@@ -12,6 +12,8 @@ def backtracking(csp):
 def ac_3(csp):
     """if one user rejects a profile, this will update the rejected profile's domain as necessary"""
     #constraint acquistion??
+    #something here
+    
 
 def csp(profile):
     """Variables are each user, constraints are True/False and thresholds for heuristics"""
