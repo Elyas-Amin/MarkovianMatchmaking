@@ -7,7 +7,8 @@ class Profile:
         self.zodiac = zodiac
         self.education_level = education_level
         self.tags = set()
-        self.compatibility = []
+        self.compatabile_profiles = set()
+        self.preferences = set()
         
     def compute_compatibility(self, match):
         tags_score = len(set.intersection(self.tags, match.tags))
