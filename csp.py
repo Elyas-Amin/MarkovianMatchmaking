@@ -12,6 +12,11 @@ class CSP:
 def isComplete(assigment):
     return len(assigment) == TOTAL_USERS
         
+def isConsistent(profiles, value, assignment, var):
+    #check if the compatability scores are within a certain range
+    if var.compute_compatibility(value) >= 0.5:
+        return True
+    return False
 
 def mrv(users):
     #Choose profile with least amount of prefernecs
@@ -21,9 +26,9 @@ def mrv(users):
             min = x
     return min
     
-
 def forward_checking(csp):
     """if domain becomes < 10, return failure"""
+    
     
 def backtracking_search(profiles):
     assigment = {}
@@ -35,8 +40,11 @@ def backtracking(assigment, profiles):
         return assigment
     var = mrv(assigment, profiles) #choose next user
     for value in var:
-        if is_consistent(profiles, value, assigment, var):
-            assigment[var] = value
+        if isConsistent(profiles, value, assigment, var):
+            if var in assigment.keys():
+                assigment[var].append(value) #add new value to list
+            else: #createa a new entry with list value containing the profile to be added
+                assigment[var] = [value]
             inferences = forward_checking(profiles, assigment, var, value)
             if inferences:
                 result = backtracking(assigment, profiles)

@@ -10,7 +10,7 @@ class Profile:
         self.compatabile_profiles = set()
         self.preferences = set()
         
-    def compute_compatibility(self, match):
+    def compute_compatibility(self, match): #normalize comptability between 0 and 1
         tags_score = len(set.intersection(self.tags, match.tags))
         return tags_score
     
