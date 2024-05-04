@@ -30,10 +30,21 @@ def forward_checking(csp):
     """if domain becomes < 10, return failure"""
     
     
+    
 def backtracking_search(profiles):
     assigment = {}
     return backtracking(assigment, profiles)
 
+def constraint_acquisition(csp):
+    """if one user rejects a profile, this will update the rejected profile's domain as necessary"""
+    #constraint acquistion??
+    #something here
+    
+
+def csp(profile):
+    """Variables are each user, constraints are True/False and thresholds for heuristics"""
+    
+    
 def backtracking(assigment, profiles):
     """if forward checking returns failure, update constraint thresholds"""
     if isComplete(assigment):
@@ -50,14 +61,5 @@ def backtracking(assigment, profiles):
                 result = backtracking(assigment, profiles)
                 if result:
                     return result
-            del assigment[var]
+            del assigment[var].remove(value)
     return False
-
-def ac_3(csp):
-    """if one user rejects a profile, this will update the rejected profile's domain as necessary"""
-    #constraint acquistion??
-    #something here
-    
-
-def csp(profile):
-    """Variables are each user, constraints are True/False and thresholds for heuristics"""
