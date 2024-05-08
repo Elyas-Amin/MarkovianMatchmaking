@@ -18,18 +18,21 @@ def isConsistent(profiles, value, assignment, var):
         return True
     return False
 
-def mrv(users):
-    #Choose profile with least amount of prefernecs
-    min = users[0]
-    for x in users:
-        if len(x.prefernces) < len(min.prefernces):
-            min = x
-    return min
+# def mrv(users):
+#     #Choose profile with least amount of prefernecs
+#     min = users[0]
+#     for x in users:
+#         if len(x.prefernces) < len(min.prefernces):
+#             min = x
+#     return min
     
-def forward_checking(csp):
-    """if domain becomes < 10, return failure"""
+# def forward_checking(csp):
+#     """if domain becomes < 10, return failure"""
+#   check cluster size
     
-    
+#check to see if fc is necessary for csp's
+
+#
     
 def backtracking_search(profiles):
     assigment = {}
@@ -51,7 +54,7 @@ def backtracking(assigment, profiles):
         return assigment
     var = mrv(assigment, profiles) #choose next user
     for value in var:
-        if isConsistent(profiles, value, assigment, var):
+        if isConsistent(profiles, value, assigment, var): #if not consistent then remove profile
             if var in assigment.keys():
                 assigment[var].append(value) #add new value to list
             else: #createa a new entry with list value containing the profile to be added

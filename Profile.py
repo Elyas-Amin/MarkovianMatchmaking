@@ -8,7 +8,7 @@ class Profile:
         self.education_level = education_level
         self.tags = set()
         self.compatabile_profiles = set()
-        self.preferences = set()
+        self.preferences = set() 
         
     def compute_compatibility(self, match): #normalize comptability between 0 and 1
         tags_score = len(set.intersection(self.tags, match.tags))
