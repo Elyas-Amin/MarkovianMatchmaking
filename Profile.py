@@ -1,5 +1,6 @@
 class Profile:
     def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str, preferences):
+    def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str, preferences):
         self.id = id
         self.age = age
         self.religion = religion
