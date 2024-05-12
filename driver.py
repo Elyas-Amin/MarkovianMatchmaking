@@ -1,6 +1,8 @@
 import sqlite3
 import random
+import json
 from simulator import Simulator
+from Profile import Profile
 
 # Connect to the SQLite database
 conn = sqlite3.connect('profiles.db')
@@ -14,26 +16,35 @@ all_profile_ids = [row[0] for row in c.fetchall()]
 user_profile_id = random.choice(all_profile_ids)
 
 # Select 100 random profiles excluding the user profile
-other_profiles = random.sample([id for id in all_profile_ids if id != user_profile_id], 100)
+other_profiles = random.sample([id for id in all_profile_ids if id != user_profile_id], 1000)
+
+# Fetch the user profile
+c.execute("SELECT * FROM profiles WHERE id=?", (user_profile_id,))
+user_row = c.fetchone()
+
+# Parse the preferences column from JSON to dictionary
+preferences = json.loads(user_row[6])  # Assuming preferences is the 7th column (index 6)
+
+# Create a Profile instance for the user
+user_profile = Profile(user_row[0], user_row[1], user_row[2], user_row[3], user_row[4], user_row[5], preferences)
+
+# Fetch the other profiles and convert them to Profile instances
+other_profiles_instances = []
+for profile_id in other_profiles:
+    c.execute("SELECT * FROM profiles WHERE id=?", (profile_id,))
+    profile_row = c.fetchone()
+    preferences = json.loads(profile_row[6])
+    profile_instance = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences)
+    other_profiles_instances.append(profile_instance)
 
 # Close the connection
 conn.close()
 
-# Process the user profile
-print(f"User profile ID: {user_profile_id}")
-
-# Process other profiles
-for profile_id in other_profiles:
-    # Fetch the profile details from the database
-    conn = sqlite3.connect('profiles.db')
-    c = conn.cursor()
-    c.execute("SELECT * FROM profiles WHERE id=?", (profile_id,))
-    row = c.fetchone()
-    if row:
-        # Process the profile data as needed
-        print(f"Profile ID: {row[0]}, Age: {row[1]}, Religion: {row[2]}, Location: {row[3]}, Zodiac: {row[4]}, Education Level: {row[5]}, Preferences: {row[6]}, Tags: {row[7]}")
-    conn.close()
-
 # Initialize the simulator
-accepts, rejects = Simulator(user_profile_id, other_profiles)
-print(accepts, rejects)
+simulation = Simulator()
+
+# Simulate the user's decisions
+accepts, rejects = simulation.simulation(user_profile, other_profiles_instances)
+
+print(len(accepts))
+print(len(rejects))

@@ -1,16 +1,17 @@
 import numpy as np
 import uuid
 import sqlite3
+import json
 
 from Profile import Profile
 
 # lists of characteristics for profiles to be generated from
-r = ['Buddhist', 'Zoroastrian', 'Christian', 'Jewish', 'Muslim', 'Hindu']
-l = ['San Francisco', 'New York', 'Los Angeles', 'Chicago', 'Boston', 'Houston', 'Philadelphia']
-z = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'Pisces']
-e = ['high school', 'undergraduate', 'graduate']
-t = ['tennis', 'swimming', 'art', 'museum', 'cooking', 'romantic']
-r_pref = ['open to all', 'same']
+r = ["Buddhist", "Zoroastrian", "Christian", "Jewish", "Muslim", "Hindu"]
+l = ["San Francisco", "New York", "Los Angeles", "Chicago", "Boston", "Houston", "Philadelphia"]
+z = ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "Pisces"]
+e = ["high school", "undergraduate", "graduate"]
+t = ["tennis", "swimming", "art", "museum", "cooking", "romantic"]
+r_pref = ["open to all", "same"]
 
 
 def generate_profile(religions, locations, zodiac_signs, education_levels, tags):
@@ -36,6 +37,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
 
     return p
 
+
 def generate_database(size):
     # Connect to the SQLite database
     conn = sqlite3.connect('profiles.db')
@@ -48,8 +50,11 @@ def generate_database(size):
     # Generate and insert profiles into the database
     for x in range(size):
         profile = generate_profile(r, l, z, e, t)
+        # Convert preferences and tags to JSON strings
+        preferences_json = json.dumps(profile.preferences)
+        tags_json = json.dumps(list(profile.tags))
         c.execute("INSERT INTO profiles (id, age, religion, location, zodiac, education_level, preferences, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                  (profile.id, profile.age, profile.religion, profile.location, profile.zodiac, profile.education_level, str(profile.preferences), str(profile.tags)))
+                  (profile.id, profile.age, profile.religion, profile.location, profile.zodiac, profile.education_level, preferences_json, tags_json))
 
     # Commit changes and close the connection
     conn.commit()
