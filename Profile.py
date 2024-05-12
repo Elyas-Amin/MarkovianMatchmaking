@@ -1,5 +1,5 @@
 class Profile:
-    def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str):
+    def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str, preferences):
         self.id = id
         self.age = age
         self.religion = religion
@@ -7,6 +7,7 @@ class Profile:
         self.zodiac = zodiac
         self.education_level = education_level
         self.tags = set()
+        self.preferences = preferences
         self.compatibility = []
         
     def compute_compatibility(self, match):
@@ -14,4 +15,4 @@ class Profile:
         return tags_score
     
     def __repr__(self):
-        return f'\[{self.id}, {self.age}, {self.religion}, {self.location}, {self.zodiac}, {self.education_level}, {self.tags}\]'
+        return f'\[{self.id}, {self.age}, {self.religion}, {self.location}, {self.zodiac}, {self.education_level}, {self.tags}, {self.preferences}\]'
