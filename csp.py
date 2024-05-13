@@ -1,4 +1,5 @@
 from Profile import Profile
+from simulator import Simulator
 import sqlite3
 import json
 import random
@@ -18,19 +19,19 @@ class CSP:
             return abs(user.age - potential_match.age) <= var_constraints
         elif var == "religion_pref":
             return potential_match.religion in var_constraints
-        # elif var == "location_pref":
-        #     return potential_match.location == var_constraints
         elif var == "zodiac_pref":
             return potential_match.zodiac in var_constraints if not potential_match.preferences["zodiac_pref"] else True
         elif var == "education_pref":
             return potential_match.education_level in var_constraints if not potential_match.preferences["education_pref"] else True
+        
 
-    def forward_checking(self, user, variables, var, potential_match, constraints, generated_profiles):
+    def forward_checking(self, user, variables, var, potential_match, constraints, profiles):
         # generated_profiles.remove(potential_match)
 
-        if len(generated_profiles) < 2:
-            return False
-
+        #What is the base case?
+        if not variables:
+            return True
+                
         for neighbor in variables:
             if neighbor == var:
                 continue
@@ -41,22 +42,32 @@ class CSP:
         # generated_profiles.append(potential_match)
         return True
 
-    def match_profiles(self, user, profiles, var_count, potential_match, matches):
+    def match_profiles(self, user, profiles, user_matches):
         constraints = user.preferences
         
+        var_count = 0
+        for potential_match in profiles:
+            self.match_profiles_helper(user, profiles, potential_match, constraints, var_count, user_matches)
+        
+        return user_matches
+  
+    
+    def match_profiles_helper(self, user, profiles, potential_match, constraints, var_count, matches):
         if var_count == 3: #base case
             return matches
-
+        variables = matches.keys()
+        updated_variables = list(matches.keys())
         for var in matches.keys():
             if len(matches[var]) >= 1 and potential_match in matches[var]:
                 continue  # Skip if potential match is already assigned
             var_constraints = constraints[var]
 
+            updated_variables.remove(var)
             if self.isConsistent(user, var, var_constraints, potential_match):
                 matches[var].append(potential_match)
-                inferences = self.forward_checking(user, matches.keys(), var, potential_match, constraints, profiles)
+                inferences = self.forward_checking(user, updated_variables, var, potential_match, constraints, profiles)
                 if inferences:
-                    result = self.match_profiles(user, profiles, var_count + 1, potential_match, matches)
+                    result = self.match_profiles_helper(user, profiles, potential_match, constraints, var_count + 1, matches)
                     if result:
                         return result
                 matches[var].remove(potential_match)
@@ -66,6 +77,7 @@ class CSP:
 
 if __name__ == "__main__":
     csp = CSP()
+    sim = Simulator()
 
     conn = sqlite3.connect('profiles.db')
     c = conn.cursor()
@@ -78,9 +90,8 @@ if __name__ == "__main__":
 
 
     START_TIME = timeit.default_timer()
-    c.execute("SELECT * FROM profiles ORDER BY id LIMIT 2000")
+    c.execute("SELECT * FROM profiles ORDER BY id LIMIT 1000")
     random_profiles = c.fetchall()
-    print("done")
 
     profiles = []
     counter1 =0
@@ -107,27 +118,33 @@ if __name__ == "__main__":
             "education_pref": []
 
         }
-        var_count = 0
         profile_copy = profiles.copy()
         profile_copy.remove(user)
-        for potential_match in profile_copy:
-            matches[user] = csp.match_profiles(user, profile_copy, var_count, potential_match, user_matches)
-        counter +=1
+        matches[user] = csp.match_profiles(user, profile_copy, user_matches)
+        counter+=1
         print(counter)
     STOP_TIME = timeit.default_timer()
 
-    # Printing the result
-    for user, match in matches.items():
-        if type(match) == bool:
+    final_matches = {}
+
+    for user, var_dict in matches.items():
+        count = 0
+        if type(var_dict) == bool:
             print(user.id, 0)
             continue
         match_set = set()
-        for var, list in match.items():
-            for p in list:
+        for var, profiles in var_dict.items():
+            for p in profiles:
                 if p not in match_set:
                     match_set.add(p)
-        
-        print(user.id, len(match_set))
+        final_matches[user] = match_set
+        simulation_test = sim.simulation(user, match_set)
+        sum_total = len(simulation_test[0]) + len(simulation_test[1])
+        print(len(simulation_test[0])/sum_total, len(simulation_test[1])/sum_total)
+        # print(user.id, len(match_set))
+    
+
+    
     print(STOP_TIME-START_TIME)
 
 
