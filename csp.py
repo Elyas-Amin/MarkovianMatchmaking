@@ -1,91 +1,122 @@
 from Profile import Profile
+import sqlite3
+import json
+import random
 
 global TOTAL_USERS
 TOTAL_USERS = 1000
 
 class CSP:
     def __init__(self):
-        self.variables - {}
+        self.variables = {}
         self.values = {}
 
-    # def isComplete(assigment):
-    #     return len(assigment) == TOTAL_USERS
-            
-    def isConsistent(self, user, var, constraints[var], potential_match):
-        #in backtracking relax the constraints
-        if var == "age": #age constraint should be single number
-            if abs(user.age - potential_match.age) <= constraints[var]:
-                return True
-        elif var == "religion":
-            if potential_match.va not in constraints[var]:
-                return False
-            return True
-        elif var == "location":
-            if potential_match.location not in constraints[var]:
-                return False
-            return True
-        elif var == "zodiac":
-            if potential_match.zodiac not in constraints[var]:
-                return False
-            return True
-        elif var == "education_level":
-            if potential_match.education_level not in constraints[var]:
-                return False
-            return True            
-        
-        
+    def isConsistent(self, user, var, var_constraints, potential_match):
+        if var == "age_range":
+            return abs(user.age - potential_match.age) <= var_constraints
+        elif var == "religion_pref":
+            return potential_match.religion in var_constraints
+        # elif var == "location_pref":
+        #     return potential_match.location == var_constraints
+        elif var == "zodiac_pref":
+            return potential_match.zodiac in var_constraints
+        elif var == "education_pref":
+            return potential_match.education_level in var_constraints
+
     def forward_checking(self, user, variables, var, potential_match, constraints, generated_profiles):
-        remaining_profiles = generated_profiles.copy() #not sure if needed, ask jeffrey
-        remaining_profiles.remove(potential_match) #remove current match
-        
-        if remaining_profiles < 10:
+        # generated_profiles.remove(potential_match)
+
+        if len(generated_profiles) < 2:
             return False
-        
+
         for neighbor in variables:
-            if neighbor == var: #skip current var
+            if neighbor == var:
                 continue
-            #check if other var will reduce the overall remaining profiles to less than 10
-            if not self.isConsistent(user, neighbor, constraints[neighbor], potential_match):
+            neighbor_constraints = constraints[neighbor]
+            if not self.isConsistent(user, neighbor, neighbor_constraints, potential_match):
                 return False
+            
+        # generated_profiles.append(potential_match)
         return True
 
-    def constraint_acquisition(csp):
-        """if one user rejects a profile, this will update the rejected profile's domain as necessary"""
-        #constraint acquistion??
-        #something here
-        
-    def match_profiles(self, user, generated_profiles, matches = {}):
-                
-        variables = user.preferences.keys()
-        domain = generated_profiles.copy() #not sure if needed, ask jeffrey
-        domain.remove(user)
-        constraints = user.prefernces.copy() #not sure if needed, ask jeffrey
-            
-        for var in variables:
-            matches[var] = []    
-                
-        for potential_match in generated_profiles:
-            for var in variables: #choose next characteristic to match
-                if self.isConsistent(user, var, constraints[var], potential_match):
-                    matches[var].append(potential_match) #don't need to reduce domain, just add to matches
-                    inferences = self.forward_checking(user, variables, var, potential_match, constraints[var], generated_profiles)
+    def match_profiles(self, user, profiles, var_count, matches):
+        constraints = user.preferences
+
+        if var_count == 3:
+            return matches
+
+        for potential_match in profiles:
+            for var in matches.keys():
+                if len(matches[var]) == 1 and potential_match in matches[var]:
+                    continue  # Skip if potential match is already assigned
+                var_constraints = constraints[var]
+
+                if self.isConsistent(user, var, var_constraints, potential_match):
+                    matches[var].append(potential_match)
+                    inferences = self.forward_checking(user, matches.keys(), var, potential_match, constraints, profiles)
                     if inferences:
-                        result = match_profiles(user, domain, matches)
+                        result = self.match_profiles(user, profiles, var_count + 1, matches)
                         if result:
                             return result
-                    matches[var].remove(potential_match) #remove current assigment in fc fails
-            return False
+                    matches[var].remove(potential_match)
+
+        return False
 
 
-#########################################################################
+if __name__ == "__main__":
+    csp = CSP()
 
-def __main__(self):
-    generated_profiles = #call on profile generator here
-    
+    conn = sqlite3.connect('profiles.db')
+    c = conn.cursor()
+
+    # c.execute("SELECT id FROM profiles")
+    # all_profile_ids = [row[0] for row in c.fetchall()]
+
+    # Select 1000 random profiles excluding the user profile
+    # random_profiles = random.sample([id for id in all_profile_ids], 1000)
+
+    c.execute("SELECT * FROM profiles ORDER BY id LIMIT 10000")
+    random_profiles = c.fetchall()
+
+    profiles = []
+    for profile_tuple in random_profiles:
+        profile_id = profile_tuple[0]  # Extracting the id from the tuple
+        c.execute("SELECT * FROM profiles WHERE id=?", [profile_id])
+        profile_row = c.fetchone()
+        preferences = json.loads(profile_row[6])
+        profile_instance = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences)
+        profiles.append(profile_instance)
+
+    conn.close()
+
     matches = {}
-    
-    for user in generated_profiles:
-        matches[user] = self.match_profiles(user, generated_profiles)
-    
-    return matches
-    
+
+    for user in profiles:
+        user_matches = {
+            "age_range": [],
+            # "religion_pref": [],
+            "zodiac_pref": [],
+            "education_pref": []
+
+        }
+        var_count = 0
+        profile_copy = profiles.copy()
+        profile_copy.remove(user)
+        matches[user] = csp.match_profiles(user, profile_copy, var_count, user_matches)
+
+        # Printing the result
+        for user, match in matches.items():
+            if type(match) == bool:
+                continue
+            # print(len(match["age_range"]))
+            match_set = set()
+            for var, list in match.items():
+                for p in list:
+                    if p not in match_set:
+                        match_set.add(p)
+            
+            print(user.id, len(match_set))
+
+
+
+
