@@ -40,9 +40,9 @@ class DQNAgent:
             self.memory.pop(0)  # Remove the oldest experience
 
     def act(self, state):
+        state = np.expand_dims(state, axis = 0)
         print(np.array(state).shape)
-        pdb.set_trace()
-        output = self.model.predict(state)
+        output = self.model.predict(np.array(state), batch_size = None)
         print("output ", output)
         pdb.set_trace()
         act_values = self.model.predict(state)
