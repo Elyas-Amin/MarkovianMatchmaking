@@ -4,9 +4,9 @@ global TOTAL_USERS
 TOTAL_USERS = 1000
 
 class CSP:
-    def __init__(self):
-        self.variables - {}
-        self.values = {}
+    # def __init__(self):
+    #     self.variables = {}
+    #     self.values = {}
 
     # def isComplete(assigment):
     #     return len(assigment) == TOTAL_USERS
@@ -17,7 +17,7 @@ class CSP:
             if abs(user.age - potential_match.age) <= constraints[var]:
                 return True
         elif var == "religion":
-            if potential_match.va not in constraints[var]:
+            if potential_match.religion not in constraints[var]:
                 return False
             return True
         elif var == "location":
@@ -35,7 +35,7 @@ class CSP:
         
         
     def forward_checking(self, user, variables, var, potential_match, constraints, generated_profiles):
-        remaining_profiles = generated_profiles.copy() #not sure if needed, ask jeffrey
+        remaining_profiles = generated_profiles #not sure if needed, ask jeffrey
         remaining_profiles.remove(potential_match) #remove current match
         
         if remaining_profiles < 10:
@@ -49,12 +49,12 @@ class CSP:
                 return False
         return True
 
-    def constraint_acquisition(csp):
-        """if one user rejects a profile, this will update the rejected profile's domain as necessary"""
-        #constraint acquistion??
-        #something here
+    # def constraint_acquisition(csp):
+    #     """if one user rejects a profile, this will update the rejected profile's domain as necessary"""
+    #     #constraint acquistion??
+    #     #something here
         
-    def match_profiles(self, user, generated_profiles, matches = {}):
+    def match_profiles(self, user, generated_profiles, matches):
                 
         variables = user.preferences.keys()
         domain = generated_profiles.copy() #not sure if needed, ask jeffrey
@@ -62,7 +62,7 @@ class CSP:
         constraints = user.prefernces.copy() #not sure if needed, ask jeffrey
             
         for var in variables:
-            matches[var] = []    
+            matches[var] = {} #initialize empty lists for each variable
                 
         for potential_match in generated_profiles:
             for var in variables: #choose next characteristic to match
@@ -70,7 +70,7 @@ class CSP:
                     matches[var].append(potential_match) #don't need to reduce domain, just add to matches
                     inferences = self.forward_checking(user, variables, var, potential_match, constraints[var], generated_profiles)
                     if inferences:
-                        result = match_profiles(user, domain, matches)
+                        result = self.match_profiles(user, domain, matches)
                         if result:
                             return result
                     matches[var].remove(potential_match) #remove current assigment in fc fails
