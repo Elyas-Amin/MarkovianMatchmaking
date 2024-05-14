@@ -1,0 +1,7 @@
+# lists of characteristics for profiles to be generated from
+r = ["Buddhist", "Zoroastrian", "Christian", "Jewish", "Muslim", "Hindu"]
+l = ["San Francisco", "New York", "Los Angeles", "Chicago", "Boston", "Houston", "Philadelphia"]
+z = ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "Pisces"]
+e = ["high school", "undergraduate", "graduate"]
+t = ["yoga", "hiking", "travel", "adventure", "photography", "music", "concerts", "movies", "reading", "writing", "poetry", "fashion", "shopping", "beach", "surfing", "sailing", "skiing", "snowboarding", "running", "cycling", "gym", "fitness", "meditation", "spirituality", "vegan", "vegetarian", "foodie", "wine", "craftbeer", "cocktails", "nightlife", "dancing", "karaoke", "boardgames", "videogames", "cosplay", "anime", "comics", "fandom", "sci-fi", "fantasy", "technology", "coding", "gadgets", "startup", "entrepreneurship", "finance", "investing", "business", "marketing", "socialmedia", "philanthropy", "volunteering", "activism", "politics", "history", "science", "psychology", "philosophy", "languages", "education", "teaching", "mentoring", "parenting", "family", "pets", "dogs", "cats", "animals", "environment", "outdoors", "nature", "gardening", "DIY", "homeimprovement", "architecture", "design", "artificialintelligence", "virtualreality", "blockchain", "cryptocurrency", "cybersecurity", "space", "astronomy"]
+r_pref = ["open to all", "same"]
