@@ -40,19 +40,13 @@ class DQNAgent:
             self.memory.pop(0)  # Remove the oldest experience
 
     def act(self, state):
-        print(np.array(state).shape)
-        pdb.set_trace()
-        output = self.model.predict(state)
-        print("output ", output)
-        pdb.set_trace()
-        act_values = self.model.predict(state)
-        print("act predict ", act_values)
         if np.random.rand() <= self.epsilon:
             # Randomly select an action: 0 for not suggesting, 1 for suggesting
             return random.randint(0, 1)
         else:
             # Use the model to predict the action
-            act_values = self.model.predict(state)
+            state = np.expand_dims(state, axis=0)
+            act_values = self.model.predict(state, batch_size=None)
             return np.argmax(act_values[0])
 
     # Inside the replay method
@@ -63,15 +57,16 @@ class DQNAgent:
         # Sample a minibatch of experiences from memory
         minibatch = random.sample(self.memory, batch_size)
 
-        for i, (state, action, reward, next_state, final) in enumerate(minibatch):
-            print(f"Replaying experience {i}: state={state}, action={action}, reward={reward}, next_state={next_state}, final={final}")
+        for state, action, reward, next_state, final in minibatch:
 
             # Calculate the target value for the Q-network
             target = reward # if experience was final state
             if not final:
-                target = (reward + self.gamma * np.amax(self.model.predict(next_state)[0]))
+                next_state = np.expand_dims(next_state, axis=0)
+                target = (reward + self.gamma * np.amax(self.model.predict(next_state, batch_size=None)[0]))
             
-            target_f = self.model.predict(state) # Get the current Q-values for the state
+            state = np.expand_dims(state, axis=0)
+            target_f = self.model.predict(state, batch_size=None) # Get the current Q-values for the state
             target_f[0][action] = target # Update the Q-value for the selected action
 
             self.model.fit(state, target_f, epochs=1, verbose=0) # Train the Q-network using the updated Q-value
@@ -129,16 +124,22 @@ state = encode_state(user, profiles[0])  # Assuming the first profile is the ini
 
 # Simulation loop
 episode_length = 10  # Number of suggestions per episode
-for episode in range(1000):
+for episode in range(100):
+    suggested = 0
+    accepts = 0
     print("Episode: ", episode)
     for _ in range(episode_length):
         # Select an action using the agent's policy
         action = agent.act(state)
+        if action ==1:
+            suggested += 1
 
         # Simulate user's response based on the selected action
         suggested_profile = profiles[action]
         response = simulator.decision(user, suggested_profile)
-        reward = 10 if response == "accept" else -1
+        reward = 10 if response else -1
+        if response:
+            accepts += 1
 
         # Encode the new state based on the simulated interaction
         next_state = encode_state(user, suggested_profile)
@@ -151,9 +152,11 @@ for episode in range(1000):
 
         # Set the current state to the new state
         state = next_state
+    if suggested != 0:
+        print("accepts ", accepts/suggested)
 
     # Update the agent at the end of each episode
-    print("replay")
     agent.replay(32)
-    print("replay finished")
 
+# Save the trained model
+agent.save_model("dqn_model.h5")
