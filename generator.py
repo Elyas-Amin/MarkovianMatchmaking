@@ -4,15 +4,7 @@ import sqlite3
 import json
 
 from Profile import Profile
-
-# lists of characteristics for profiles to be generated from
-r = ["Buddhist", "Zoroastrian", "Christian", "Jewish", "Muslim", "Hindu"]
-l = ["San Francisco", "New York", "Los Angeles", "Chicago", "Boston", "Houston", "Philadelphia"]
-z = ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "Pisces"]
-e = ["high school", "undergraduate", "graduate"]
-t = ["tennis", "swimming", "art", "museum", "cooking", "romantic"]
-r_pref = ["open to all", "same"]
-
+import prof_char as p_char
 
 def generate_profile(religions, locations, zodiac_signs, education_levels, tags):
     id = str(uuid.uuid4())  # Convert UUID to string
@@ -24,7 +16,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
 
     preferences = {
         "age_range": np.random.randint(1, 50),
-        "religion_pref": r_pref[np.random.randint(len(r_pref))],
+        "religion_pref": p_char.r_pref[np.random.randint(len(p_char.r_pref))],
         "zodiac_pref": [zodiac_signs[i] for i in np.random.randint(len(zodiac_signs), size=np.random.randint(len(zodiac_signs)))],
         "education_pref": [education_levels[i] for i in np.random.randint(len(education_levels), size=np.random.randint(len(education_levels)))]
     }
@@ -33,7 +25,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
 
     # Add random tags
     for i in range(np.random.randint(len(tags))):
-        p.tags.add(tags[np.random.randint(len(tags))])
+        p.tags.add(tags[np.random.randint(1, 10)])
 
     return p
 
@@ -49,7 +41,7 @@ def generate_database(size):
 
     # Generate and insert profiles into the database
     for x in range(size):
-        profile = generate_profile(r, l, z, e, t)
+        profile = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
         # Convert preferences and tags to JSON strings
         preferences_json = json.dumps(profile.preferences)
         tags_json = json.dumps(list(profile.tags))
@@ -62,3 +54,4 @@ def generate_database(size):
 
 # Example usage
 generate_database(100000)
+# print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
