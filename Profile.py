@@ -19,20 +19,28 @@ class Profile:
 
         # Calculate age difference score
         age_diff = abs(self.age - match.age)
-        age_score = 1 / (1 + age_diff)  # Scale to range [0, 1]
+        age_score = 1 / (1 + age_diff) if age_diff < self.preferences["age_range"] else 0
 
         # Calculate preferences compatibility
         pref_score = 0
-        for key in self.preferences:
-            if key in match.preferences:
-                self_prefs = self.preferences[key]
-                match_prefs = match.preferences[key]
-                if isinstance(self_prefs, (list, set)) and isinstance(match_prefs, (list, set)):
-                    common_prefs = set(self_prefs).intersection(match_prefs)
-                    pref_score += len(common_prefs) / len(self_prefs) if len(self_prefs) > 0 else 0
+        if match.zodiac in self.preferences["zodiac_pref"]:
+            pref_score += 1
+        if match.education_level in self.preferences["education_pref"]:
+            pref_score += 1
+        if self.preferences["religion_pref"] == "open to all":
+            pref_score += 1
+        else:
+            if match.religion in self.preferences["religion_pref"]:
+                pref_score += 1
+            else:
+                pref_score -= 1
 
         # Combine scores with weights
-        compatibility_score = (tag_score + age_score + pref_score) / 3  # Adjust weights as needed
+        w1 = 2
+        w2 = 1
+        w3 = 0.2
+        compatibility_score = w1 * tag_score + w2 * age_score + w3 * pref_score  # Adjust weights as needed
+        print(compatibility_score)
 
         return compatibility_score
 
