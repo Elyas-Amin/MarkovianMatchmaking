@@ -53,5 +53,6 @@ def generate_database(size):
     conn.close()
 
 # Example usage
-generate_database(100000)
-# print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
+# generate_database(100000)
+for _ in range(20):
+    print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
