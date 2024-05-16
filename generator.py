@@ -29,6 +29,30 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
 
     return p
 
+def generate_similar_profile(user):
+    id = str(uuid.uuid4())
+    age = np.random.uniform(user.age-5, user.age+5, 11)
+    religion = 
+    new_profile = Profile()
+    
+    return
+    
+
+def generate_similar_profile_dataset(size, user: Profile, sim_dis_bool: bool):
+    
+    conn = sqlite3.connect('profiles_similar.dp')
+    c = conn.cursor()
+    
+    c.execute('''CREATE TABLE IF NOT EXITS profiles
+                 (id TEXT, age INTEGER, religion TEXT, location TEXT, aodiac TEXT, education_level TEXT, preferences TEXT, tags TEXT)''')
+    
+    for x in range(size):
+        #based on current user generate a similar profile
+        profile = generate_similar_profile(user)
+
+    
+    
+    
 
 def generate_database(size):
     # Connect to the SQLite database

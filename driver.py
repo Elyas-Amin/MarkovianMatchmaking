@@ -46,5 +46,4 @@ simulation = Simulator()
 # Simulate the user's decisions
 accepts, rejects = simulation.simulation(user_profile, other_profiles_instances)
 
-print(len(accepts))
-print(len(rejects))
+print(len(accepts)/1000, len(rejects)/1000)

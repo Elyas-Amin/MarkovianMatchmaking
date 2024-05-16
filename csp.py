@@ -13,21 +13,22 @@ class CSP:
     def __init__(self):
         self.variables = {}
         self.values = {}
-
-    def isConsistent(self, user, var, var_constraints, potential_match): #checks if the preferences of user matches teh characteristics of potential match
+    
+    def isConsistent(self, user, var, var_constraints, potential_match): #checks if the preferences of user matches the characteristics of potential match
         if var == "age_range":
-            return abs(user.age - potential_match.age) <= var_constraints
+            return (abs(user.age - potential_match.age) <= var_constraints)
         elif var == "religion_pref":
             return potential_match.religion in var_constraints
         elif var == "zodiac_pref":
-            return potential_match.zodiac in var_constraints if not potential_match.preferences["zodiac_pref"] else True
+            return potential_match.zodiac in var_constraints if not potential_match.preferences["zodiac_pref"]  else True
         elif var == "education_pref":
             return potential_match.education_level in var_constraints if not potential_match.preferences["education_pref"] else True
+        # elif var == "tag_similarity":
+        #     print(user.preferences["tag_similarity"])
+        #     return False if user.preferences["tag_similarity"] <= 0 else True
         
 
     def forward_checking(self, user, variables, var, potential_match, constraints, profiles):
-        # generated_profiles.remove(potential_match)
-
         #What is the base case?
         if not variables:
             return True
@@ -39,14 +40,14 @@ class CSP:
             if not self.isConsistent(user, neighbor, neighbor_constraints, potential_match):
                 return False
             
-        # generated_profiles.append(potential_match)
         return True
 
     def match_profiles(self, user, profiles, user_matches):
         constraints = user.preferences
-        
+
         var_count = 0
         for potential_match in profiles:
+            user.tag_overlap(potential_match)
             self.match_profiles_helper(user, profiles, potential_match, constraints, var_count, user_matches)
         
         return user_matches
@@ -90,7 +91,7 @@ if __name__ == "__main__":
 
 
     START_TIME = timeit.default_timer()
-    c.execute("SELECT * FROM profiles ORDER BY id LIMIT 1000")
+    c.execute("SELECT * FROM profiles ORDER BY id LIMIT 100")
     random_profiles = c.fetchall()
 
     profiles = []
@@ -115,12 +116,13 @@ if __name__ == "__main__":
             "age_range": [],
             # "religion_pref": [],
             "zodiac_pref": [],
-            "education_pref": []
-
+            "education_pref": [],
+            # "tag_similarity" : []
         }
         profile_copy = profiles.copy()
         profile_copy.remove(user)
         matches[user] = csp.match_profiles(user, profile_copy, user_matches)
+        print(user.preferences)
         counter+=1
         print(counter)
     STOP_TIME = timeit.default_timer()
@@ -137,10 +139,11 @@ if __name__ == "__main__":
             for p in profiles:
                 if p not in match_set:
                     match_set.add(p)
+        # print(match_set)
         final_matches[user] = match_set
         simulation_test = sim.simulation(user, match_set)
         sum_total = len(simulation_test[0]) + len(simulation_test[1])
-        print(len(simulation_test[0])/sum_total, len(simulation_test[1])/sum_total)
+        print(round(len(simulation_test[0])/sum_total, 3), round(len(simulation_test[1])/sum_total, 3))
         # print(user.id, len(match_set))
     
 

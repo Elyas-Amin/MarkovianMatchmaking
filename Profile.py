@@ -8,6 +8,10 @@ class Profile:
         self.education_level = education_level
         self.tags = set()
         self.preferences = preferences
+        
+    def tag_overlap(self, potential_match):
+        tag_score = len(self.tags.intersection(potential_match.tags))
+        self.preferences["tag_similarity"] = tag_score
 
     def compute_compatibility(self, match):
         # Calculate tag similarity
