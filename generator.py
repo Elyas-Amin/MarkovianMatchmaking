@@ -87,7 +87,6 @@ def generate_sim_dis_profile(user, sim_dis: bool):
     #disimilar profiles: choose random values from preferences of the current user
     elif not sim_dis:
         id = str(uuid.uuid4()) #random id number value creation
-        
         age = choose_random_non_preferable_age(user.age, user.preferences["age_pref"])
         location = np.random.choice(p_char.l)
         religion = np.random.choice(p_char.r) 
