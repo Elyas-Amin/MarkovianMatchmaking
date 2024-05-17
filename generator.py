@@ -67,7 +67,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
 
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
 
-    return p
+    return p    
 
 # def generate_sim_dis_profile(user, sim_dis: bool):
 #     #similar profiles: choose random values from preferences of the current user
