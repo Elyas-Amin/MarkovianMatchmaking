@@ -50,7 +50,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
 
     # Add random tags
     tags_to_add = set()
-    for i in range(np.random.randint(3, 10)):
+    for i in range(np.random.randint(4, 11)):
         tag = tags[np.random.randint(len(tags)-1)]
         while tag in tags_to_add: # Ensure no repeat tags
             tag = tags[np.random.randint(len(tags)-1)]
@@ -63,7 +63,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
         "education_pref": education_levels[np.random.randint(len(education_levels)-1)::]
     }
 
-    threshold = np.random.beta(8, 2, size=None) # Generate åacceptance threshold
+    threshold = np.random.beta(7, 3, size=None) # Generate åacceptance threshold
 
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
 
@@ -164,5 +164,5 @@ def generate_database(size):
 #     print("*****************************")
 #     print()
 
-for _ in range(50):
-    print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
+# for _ in range(50):
+#     print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))

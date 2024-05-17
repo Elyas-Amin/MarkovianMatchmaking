@@ -11,23 +11,13 @@ class Simulator:
         
         # Define scaling factor and shifting constant
         a = 1  # shape of the sigmoid
-        b = 0  # x-axis shift
+        b = -0.4  # x-axis shift
 
         # Calculate acceptance probability
-        acceptance_probability = 1 / (1 + np.exp(-a * compatibility_score + b))
-
-        # Modify acceptance probability based on feedback loop
-        if self.acceptance_history:
-            avg_acceptance_probability = sum(self.acceptance_history) / len(self.acceptance_history)
-            acceptance_probability = 0.5 * acceptance_probability + 0.5 * avg_acceptance_probability
+        acceptance_score= 1 / (1 + np.exp(-a * compatibility_score + b))
 
         # Make decision based on acceptance probability
-        if acceptance_probability >= 0.5:  # Adjust the threshold as needed
-            self.acceptance_history.append(1)
-            return True
-        else:
-            self.acceptance_history.append(0)
-            return False
+        return acceptance_score >= user.threshold
 
     # def decision(self, user: Profile, profile: Profile):
     #     '''Decisions are made based on compatibility score following a sigmoid function'''

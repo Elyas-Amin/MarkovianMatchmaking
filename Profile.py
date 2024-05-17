@@ -1,3 +1,5 @@
+import numpy as np
+
 class Profile:
     def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str, tags: set, preferences, threshold: float):
         self.id = id
@@ -16,7 +18,7 @@ class Profile:
 
     def compute_compatibility(self, match):
         # Calculate tag similarity
-        tag_score = len(self.tags.intersection(match.tags))
+        tag_score = len(self.tags.intersection(match.tags)) / 10
 
         # Calculate age difference score
         age_diff = abs(self.age - match.age)
@@ -33,15 +35,13 @@ class Profile:
         else:
             if match.religion in self.preferences["religion_pref"]:
                 pref_score += 1
-            else:
-                pref_score -= 1
+        pref_score /= 3
 
         # Combine scores with weights
-        w1 = 2
-        w2 = 1
-        w3 = 0.2
+        w1 = 0.3
+        w2 = 0.2
+        w3 = 0.5
         compatibility_score = w1 * tag_score + w2 * age_score + w3 * pref_score  # Adjust weights as needed
-        print(compatibility_score)
 
         return compatibility_score
 

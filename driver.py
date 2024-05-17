@@ -1,49 +1,79 @@
 import sqlite3
 import random
 import json
+from generator import generate_profile
+import prof_char as p_char
 from simulator import Simulator
 from Profile import Profile
+from csp import CSP
 
-# Connect to the SQLite database
-conn = sqlite3.connect('profiles.db')
-c = conn.cursor()
+# # Connect to the SQLite database
+# conn = sqlite3.connect('profiles.db')
+# c = conn.cursor()
 
-# Get the list of all profile IDs
-c.execute("SELECT id FROM profiles")
-all_profile_ids = [row[0] for row in c.fetchall()]
+# # Get the list of all profile IDs
+# c.execute("SELECT id FROM profiles")
+# all_profile_ids = [row[0] for row in c.fetchall()]
 
-# Select a random user profile ID
-user_profile_id = random.choice(all_profile_ids)
+# # Select a random user profile ID
+# user_profile_id = random.choice(all_profile_ids)
 
-# Select 100 random profiles excluding the user profile
-other_profiles = random.sample([id for id in all_profile_ids if id != user_profile_id], 1000)
+# # Select 100 random profiles excluding the user profile
+# other_profiles = random.sample([id for id in all_profile_ids if id != user_profile_id], 1000)
 
-# Fetch the user profile
-c.execute("SELECT * FROM profiles WHERE id=?", (user_profile_id,))
-user_row = c.fetchone()
+# # Fetch the user profile
+# c.execute("SELECT * FROM profiles WHERE id=?", (user_profile_id,))
+# user_row = c.fetchone()
 
-# Parse the preferences column from JSON to dictionary
-preferences = json.loads(user_row[6])  # Assuming preferences is the 7th column (index 6)
+# # Parse the preferences column from JSON to dictionary
+# preferences = json.loads(user_row[6])  # Assuming preferences is the 7th column (index 6)
 
-# Create a Profile instance for the user
-user_profile = Profile(user_row[0], user_row[1], user_row[2], user_row[3], user_row[4], user_row[5], preferences)
+# # Create a Profile instance for the user
+# user_profile = Profile(user_row[0], user_row[1], user_row[2], user_row[3], user_row[4], user_row[5], preferences)
 
-# Fetch the other profiles and convert them to Profile instances
+# # Fetch the other profiles and convert them to Profile instances
+# other_profiles_instances = []
+# for profile_id in other_profiles:
+#     c.execute("SELECT * FROM profiles WHERE id=?", (profile_id,))
+#     profile_row = c.fetchone()
+#     preferences = json.loads(profile_row[6])
+#     profile_instance = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences)
+#     other_profiles_instances.append(profile_instance)
+
+# # Close the connection
+# conn.close()
+
+user_profile = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
 other_profiles_instances = []
-for profile_id in other_profiles:
-    c.execute("SELECT * FROM profiles WHERE id=?", (profile_id,))
-    profile_row = c.fetchone()
-    preferences = json.loads(profile_row[6])
-    profile_instance = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences)
-    other_profiles_instances.append(profile_instance)
 
-# Close the connection
-conn.close()
+for _ in range(10000):
+    other_profiles_instances.append(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
+
+csp = CSP()
+
+user_matches = {
+    "age_range": [],
+    # "religion_pref": [],
+    "zodiac_pref": [],
+    "education_pref": [],
+    # "tag_similarity" : []
+}
+
+matches = csp.match_profiles(user_profile, other_profiles_instances, user_matches)
+match_set = set()
+for var, profiles in matches.items():
+    for p in profiles:
+        if p not in match_set:
+            match_set.add(p)
+
 
 # Initialize the simulator
 simulation = Simulator()
 
 # Simulate the user's decisions
-accepts, rejects = simulation.simulation(user_profile, other_profiles_instances)
+accepts, rejects = simulation.simulation(user_profile, list(match_set))
+print(user_profile)
+print(len(match_set))
+print(len(accepts)/len(match_set), len(rejects)/len(match_set))
 
-print(len(accepts)/1000, len(rejects)/1000)
+
