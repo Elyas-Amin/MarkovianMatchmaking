@@ -46,17 +46,16 @@ from csp import CSP
 user_profile = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
 other_profiles_instances = []
 
-for _ in range(10000):
+for _ in range(100000):
     other_profiles_instances.append(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
 
 csp = CSP()
 
 user_matches = {
     "age_range": [],
-    # "religion_pref": [],
     "zodiac_pref": [],
     "education_pref": [],
-    # "tag_similarity" : []
+    "tag_similarity" : []
 }
 
 matches = csp.match_profiles(user_profile, other_profiles_instances, user_matches)
@@ -73,7 +72,7 @@ simulation = Simulator()
 # Simulate the user's decisions
 accepts, rejects = simulation.simulation(user_profile, list(match_set))
 print(user_profile)
-print(len(match_set))
+print(len(match_set), len (accepts), len(rejects))
 print(len(accepts)/len(match_set), len(rejects)/len(match_set))
 
 

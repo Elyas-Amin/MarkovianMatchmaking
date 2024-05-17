@@ -11,7 +11,7 @@ class Simulator:
         
         # Define scaling factor and shifting constant
         a = 1  # shape of the sigmoid
-        b = -0.4  # x-axis shift
+        b = -0.5  # x-axis shift
 
         # Calculate acceptance probability
         acceptance_score= 1 / (1 + np.exp(-a * compatibility_score + b))
