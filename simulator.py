@@ -15,6 +15,10 @@ class Simulator:
 
         # Calculate acceptance probability
         acceptance_probability = 1 / (1 + np.exp(-a * compatibility_score + b))
+        #generatea a threshold ofr each user - maybe beta function, uniform, 
+        #future works - can be more copl=mplicated, but takes away fromt he variance for comparison
+        #target tracking - tracka value you dontnknow
+        #Evaluation: How many suggestions until acceptance - Remember expectations idea for why ratio not work
 
         # Modify acceptance probability based on feedback loop
         if self.acceptance_history:
