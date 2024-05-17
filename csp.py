@@ -27,7 +27,6 @@ class CSP:
         #     print(user.preferences["tag_similarity"])
         #     return False if user.preferences["tag_similarity"] <= 0 else True
         
-
     def forward_checking(self, user, variables, var, potential_match, constraints, profiles):
         #What is the base case?
         if not variables:

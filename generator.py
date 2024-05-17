@@ -98,7 +98,7 @@ def generate_sim_dis_profile(user, sim_dis: bool):
     #disimilar profiles: choose random values from preferences of the current user
     elif not sim_dis:
         id = str(uuid.uuid4()) #random id number value creation
-        age = choose_random_non_preferable_age(user.age, user.preferences["age_pref"])
+        age = choose_random_non_preferable_age(user.age, user.preferences["age_range"])
         location = np.random.choice(p_char.l)
         religion = np.random.choice(p_char.r) 
         education_level = np.random.choice(p_char.e)
@@ -159,10 +159,15 @@ def generate_database(size):
 # Example usage
 # generate_database(100000)
 
-# p = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
-# print(p)
-# print("---------------------------")
-# print(generate_sim_dis_profile(p, False))
+p = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
 
-for _ in range(50):
-    print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
+for _ in range(10):
+    print(p)
+    print("---------------------------")
+    print(generate_sim_dis_profile(p, True))
+    print()
+    print("*****************************")
+    print()
+
+# for _ in range(50):
+#     print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
