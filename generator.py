@@ -42,17 +42,19 @@ def choose_random_non_preferable_age(current_age, preference_range):
 
 def generate_profile(religions, locations, zodiac_signs, education_levels, tags):
     id = str(uuid.uuid4())  # Convert UUID to string
-    age = np.random.randint(18, 100)
+    age = age = int(np.random.normal(30, 5))
+    while age < 18: # Ensure age is > 18
+        age = int(np.random.normal(30, 5)) 
     religion = religions[np.random.randint(len(religions))]
     location = locations[np.random.randint(len(locations))]
     zodiac = zodiac_signs[np.random.randint(len(zodiac_signs))]
     education_level = education_levels[np.random.randint(len(education_levels))]
 
     preferences = {
-        "age_range": np.random.randint(1, 50),
+        "age_range": 5 + abs(int(np.random.normal(0,10))),
         "religion_pref": p_char.r_pref[np.random.randint(len(p_char.r_pref))],
         "zodiac_pref": [zodiac_signs[i] for i in np.random.randint(len(zodiac_signs), size=np.random.randint(len(zodiac_signs)))],
-        "education_pref": [education_levels[i] for i in np.random.randint(len(education_levels), size=np.random.randint(len(education_levels)))]
+        "education_pref": [education_levels[i] for i in range(np.random.randint(len(education_levels)))]
     }
 
     p = Profile(id, age, religion, location, zodiac, education_level, preferences)
@@ -148,10 +150,10 @@ def generate_database(size):
 # Example usage
 # generate_database(100000)
 
-p = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
-print(p)
-print("---------------------------")
-print(generate_sim_dis_profile(p, False))
+# p = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
+# print(p)
+# print("---------------------------")
+# print(generate_sim_dis_profile(p, False))
 
-# for _ in range(20):
-#     print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
+for _ in range(50):
+    print(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
