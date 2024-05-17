@@ -54,7 +54,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
         "age_range": 5 + abs(int(np.random.normal(0,10))),
         "religion_pref": p_char.r_pref[np.random.randint(len(p_char.r_pref))],
         "zodiac_pref": [zodiac_signs[i] for i in np.random.randint(len(zodiac_signs), size=np.random.randint(len(zodiac_signs)))],
-        "education_pref": [education_levels[i] for i in range(np.random.randint(len(education_levels)))]
+        "education_pref": education_levels[np.random.randint(len(education_levels)-1)::]
     }
 
     p = Profile(id, age, religion, location, zodiac, education_level, preferences)
