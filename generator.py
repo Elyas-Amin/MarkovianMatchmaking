@@ -45,23 +45,32 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
     age = age = int(np.random.normal(30, 5))
     while age < 18: # Ensure age is > 18
         age = int(np.random.normal(30, 5)) 
-    religion = religions[np.random.randint(len(religions))]
-    location = locations[np.random.randint(len(locations))]
-    zodiac = zodiac_signs[np.random.randint(len(zodiac_signs))]
-    education_level = education_levels[np.random.randint(len(education_levels))]
+    religion = religions[np.random.randint(len(religions)-1)]
+    location = locations[np.random.randint(len(locations)-1)]
+    zodiac = zodiac_signs[np.random.randint(len(zodiac_signs)-1)]
+    education_level = education_levels[np.random.randint(len(education_levels)-1)]
+
+    # Add random tags
+    tags_to_add = set()
+    counter = 0
+    for i in range(np.random.randint(3, 10)):
+        counter +=1
+        tag = tags[np.random.randint(len(tags)-1)]
+        while tag in tags_to_add: # Ensure no repeat tags
+            tag = tags[np.random.randint(len(tags)-1)]
+        tags_to_add.add(tag)
+    print(counter)
 
     preferences = {
-        "age_range": 5 + abs(int(np.random.normal(0,10))),
+        "age_range": 5 + abs(int(np.random.normal(0,8))),
         "religion_pref": p_char.r_pref[np.random.randint(len(p_char.r_pref))],
         "zodiac_pref": [zodiac_signs[i] for i in np.random.randint(len(zodiac_signs), size=np.random.randint(len(zodiac_signs)))],
         "education_pref": education_levels[np.random.randint(len(education_levels)-1)::]
     }
 
-    p = Profile(id, age, religion, location, zodiac, education_level, preferences)
+    threshold = np.random.beta(8, 2, size=None) # Generate åacceptance threshold
 
-    # Add random tags
-    for i in range(np.random.randint(3, len(tags))):
-        p.tags.add(tags[np.random.randint(1, 10)])
+    p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
 
     return p
 

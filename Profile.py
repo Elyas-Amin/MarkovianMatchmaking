@@ -1,13 +1,14 @@
 class Profile:
-    def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str, preferences):
+    def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str, tags: set, preferences, threshold: float):
         self.id = id
         self.age = age
         self.religion = religion
         self.location = location
         self.zodiac = zodiac
         self.education_level = education_level
-        self.tags = set()
+        self.tags = tags
         self.preferences = preferences
+        self.threshold = threshold
         
     def tag_overlap(self, potential_match):
         tag_score = len(self.tags.intersection(potential_match.tags))
@@ -46,4 +47,4 @@ class Profile:
 
     
     def __repr__(self):
-        return f'\[{self.id}, {self.age}, {self.religion}, {self.location}, {self.zodiac}, {self.education_level}, {self.tags}, {self.preferences}\]'
+        return f'\[{self.id}, {self.age}, {self.religion}, {self.location}, {self.zodiac}, {self.education_level}, {self.tags}, {self.preferences}, {self.threshold}\]'
