@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 user = generate_profile()
 profiles = []
 
-num = 500
+num = 1000
 for _ in range(num):
     profiles.append(generate_profile())
 
@@ -38,12 +38,9 @@ csp_accepts, csp_rejects, csp_rt = simulation.simulation(user, list(match_set))
 drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
 
 print(user)
-print(len(rand_accepts)/num, sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
-print(len((csp_accepts))/len(match_set) if len(match_set) > 0 else 0, sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
-print(len(drl_accepts)/len(drl_suggested), sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
+print(len(rand_accepts), num, sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
+print(len((csp_accepts)), len(match_set) if len(match_set) > 0 else 0, sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
+print(len(drl_accepts), len(drl_suggested), sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
 
-plt.plot(agent.losses)
-plt.xlabel('Step')
-plt.ylabel('Loss')
-plt.title('Learning Loss')
-plt.show()
+agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
+agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
