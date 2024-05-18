@@ -75,7 +75,7 @@ csp_accepts, csp_rejects = simulation.simulation(user_profile, list(match_set))
 
 print(user_profile)
 # print(len(match_set))
-print(len(rand_accepts)/10000)
+print(len(rand_accepts)/100000)
 print(len(csp_accepts)/len(match_set))
 
 
