@@ -19,7 +19,6 @@ class Profile:
     def compute_compatibility(self, match):
         # Calculate tag similarity
         tag_score = len(self.tags.intersection(match.tags)) / 10
-        # tag_score = 1 / (1 + np.exp(-1 * len(self.tags.intersection(match.tags)) + 5))
 
         # Calculate age difference score
         age_score = 1 / (1 + abs(self.age - match.age))
