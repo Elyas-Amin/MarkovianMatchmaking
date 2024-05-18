@@ -63,7 +63,7 @@ def generate_profile(religions, locations, zodiac_signs, education_levels, tags)
         "education_pref": education_levels[np.random.randint(len(education_levels)-1)::]
     }
 
-    threshold = np.random.beta(7, 3, size=None) # Generate åacceptance threshold
+    threshold = np.random.beta(6, 3, size=None) # Generate åacceptance threshold
 
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
 

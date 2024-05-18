@@ -23,20 +23,20 @@ class CSP:
             return potential_match.zodiac in var_constraints if not potential_match.preferences["zodiac_pref"]  else True
         elif var == "education_pref":
             return potential_match.education_level in var_constraints if not potential_match.preferences["education_pref"] else True
-        # elif var == "tag_similarity":
-        #     print(user.preferences["tag_similarity"])
-        #     return False if user.preferences["tag_similarity"] <= 0 else True
+        elif var == "tag_similarity":
+            # print(user.preferences["tag_similarity"])
+            return False if user.preferences["tag_similarity"] <= 2 else True
         
-    def forward_checking(self, user, variables, var, potential_match, constraints, profiles):
+    def forward_checking(self, user, updated_variables, var, potential_match, user_constraints, profiles):
         #What is the base case?
-        if not variables:
+        if not updated_variables:
             return True
                 
-        for neighbor in variables:
-            if neighbor == var:
+        for neighbor_var in updated_variables:
+            if neighbor_var == var: #if looking at current variable, skip. Precautiornary because it should have already been removed
                 continue
-            neighbor_constraints = constraints[neighbor]
-            if not self.isConsistent(user, neighbor, neighbor_constraints, potential_match):
+            neighbor_constraints = user_constraints[neighbor_var]
+            if not self.isConsistent(user, neighbor_var, neighbor_constraints, potential_match):
                 return False
             
         return True
@@ -46,23 +46,22 @@ class CSP:
 
         var_count = 0
         for potential_match in profiles:
-            user.tag_overlap(potential_match)
+            user.tag_overlap(potential_match) #get the tag similarity between user and profile
             self.match_profiles_helper(user, profiles, potential_match, constraints, var_count, user_matches)
         
         return user_matches
   
     
     def match_profiles_helper(self, user, profiles, potential_match, constraints, var_count, matches):
-        if var_count == 3: #base case
+        if var_count == 4: #base case
             return matches
-        variables = matches.keys()
         updated_variables = list(matches.keys())
         for var in matches.keys():
             if len(matches[var]) >= 1 and potential_match in matches[var]:
                 continue  # Skip if potential match is already assigned
-            var_constraints = constraints[var]
+            var_constraints = constraints[var] #add the potential match to the correct preference match
 
-            updated_variables.remove(var)
+            updated_variables.remove(var) #remove the current variable that we're testing for forward checking
             if self.isConsistent(user, var, var_constraints, potential_match):
                 matches[var].append(potential_match)
                 inferences = self.forward_checking(user, updated_variables, var, potential_match, constraints, profiles)
@@ -126,28 +125,28 @@ if __name__ == "__main__":
         print(counter)
     STOP_TIME = timeit.default_timer()
 
-    final_matches = {}
+    # final_matches = {}
 
-    for user, var_dict in matches.items():
-        count = 0
-        if type(var_dict) == bool:
-            print(user.id, 0)
-            continue
-        match_set = set()
-        for var, profiles in var_dict.items():
-            for p in profiles:
-                if p not in match_set:
-                    match_set.add(p)
-        # print(match_set)
-        final_matches[user] = match_set
-        simulation_test = sim.simulation(user, match_set)
-        sum_total = len(simulation_test[0]) + len(simulation_test[1])
-        print(round(len(simulation_test[0])/sum_total, 3), round(len(simulation_test[1])/sum_total, 3))
-        # print(user.id, len(match_set))
+    # for user, var_dict in matches.items():
+    #     count = 0
+    #     if type(var_dict) == bool:
+    #         print(user.id, 0)
+    #         continue
+    #     match_set = set()
+    #     for var, profiles in var_dict.items():
+    #         for p in profiles:
+    #             if p not in match_set:
+    #                 match_set.add(p)
+    #     # print(match_set)
+    #     final_matches[user] = match_set
+    #     simulation_test = sim.simulation(user, match_set)
+    #     sum_total = len(simulation_test[0]) + len(simulation_test[1])
+    #     print(round(len(simulation_test[0])/sum_total, 3), round(len(simulation_test[1])/sum_total, 3))
+    #     # print(user.id, len(match_set))
     
 
     
-    print(STOP_TIME-START_TIME)
+    # print(STOP_TIME-START_TIME)
 
 
 

@@ -12,6 +12,8 @@ from datetime import datetime
 
 import prof_char as p_char
 
+from generator import generate_profile
+
 class DQNAgent:
     def __init__(self, state_size, action_size, max_memory_size=1000):
         self.state_size = state_size
@@ -38,6 +40,24 @@ class DQNAgent:
         model.add(keras.layers.Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=keras.optimizers.Adam(learning_rate=0.001))
         return model
+    
+    def encode_state(self, user, match):
+        # Encode user's age, education level, religion, zodiac sign
+        user_state = np.array([
+            user.age,
+            p_char.e.index(user.education_level),
+            p_char.r.index(user.religion),
+            p_char.z.index(user.zodiac)
+        ])
+
+        # Encode match profile's characteristics
+        match_state = np.zeros(len(p_char.r) + len(p_char.l) + len(p_char.z) + 1)
+        match_state[p_char.r.index(match.religion)] = 1 # religion
+        match_state[len(p_char.r) + p_char.l.index(match.location)] = 1 # location
+        match_state[len(p_char.r) + len(p_char.l) + p_char.z.index(match.zodiac)] = 1 # zodiac
+        match_state[len(match_state) - 1] = match.age # age
+
+        return np.concatenate((user_state, match_state))
 
     def remember(self, state, action, reward, next_state, final):
         self.memory.append((state, action, reward, next_state, final))
@@ -87,17 +107,17 @@ class DQNAgent:
 
 
 # Initialize the environment and DRL agent
-state_size = 31
+state_size = 30
 action_size = 2  # Assuming three possible profiles to suggest
 agent = DQNAgent(state_size, action_size)
 simulator = Simulator()
 visualizer = QValuesVisualizer()
 
-# Fetch user and profiles from the database
-retriever = Retriever()
-training_set = []
-for _ in range(1):
-    training_set.append(retriever.random_profiles(1000))
+# # Fetch user and profiles from the database
+# retriever = Retriever()
+# training_set = []
+# for _ in range(1):
+#     training_set.append(retriever.random_profiles(1000))
 
 def encode_state(user_profile, suggested_profile):
     # Encode user's age, education level, religion, zodiac sign
@@ -109,70 +129,74 @@ def encode_state(user_profile, suggested_profile):
     ])
 
     # Encode suggested profile's characteristics
-    suggested_state = np.zeros(len(p_char.r) + len(p_char.l) + len(p_char.z) + 2)  #  2 extra slots for compatibility score and age
+    suggested_state = np.zeros(len(p_char.r) + len(p_char.l) + len(p_char.z) + 1)  #  1 extra slots for compatibility score and age
     suggested_state[p_char.r.index(suggested_profile.religion)] = 1
     suggested_state[len(p_char.r) + p_char.l.index(suggested_profile.location)] = 1
     suggested_state[len(p_char.r) + len(p_char.l) + p_char.z.index(suggested_profile.zodiac)] = 1
 
     # Compute compatibility score and discretize it
-    compatibility_score = user_profile.compute_compatibility(suggested_profile)
-    discretized_score = min(5, max(0, int(round(compatibility_score * 5))))
-    suggested_state[len(suggested_state) - 1] = discretized_score
-    suggested_state[len(suggested_state) - 2] = suggested_profile.age
+    suggested_state[len(suggested_state) - 1] = suggested_profile.age
 
     return np.concatenate((user_state, suggested_state))
 
-for user, profiles in training_set:
-    # Initialize the initial state to the user's state
-    state = encode_state(user, profiles[0])  # Assuming the first profile is the initial suggestion
+user = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
+profiles = set()
+print(user)
 
-    # Simulation loop
-    episode_length = 50  # Number of suggestions per episode
-    for episode in range(100):
-        suggested = 0
-        accepts = 0
-        print("Episode: ", episode)
-        for _ in range(episode_length):
+for _ in range(100):
+    profiles.add(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
 
-            # Select an action using the agent's policy
-            action = agent.act(state)
-            if action == 1:
-                suggested += 1
+# Initialize the initial state to the user's state
+state = encode_state(user, profiles.pop())  # Assuming the first profile is the initial suggestion
 
-                # Simulate user's response based on the selected action
-                suggested_profile = profiles[action]
-                response = simulator.decision(user, suggested_profile)
-                reward = 10 if response else -5
-                if response:
-                    accepts += 1
+# Simulation loop
+episode_length = 10  # Number of profiles per episode
+suggested = 0
+accepts = 0
+while profiles:
+    for _ in range(episode_length):
+        if len(profiles) == 0:
+            break
+        # Select an action using the agent's policy
+        action = agent.act(state)
+        if action == 1:
+            suggested += 1
 
-                # Encode the new state based on the simulated interaction
-                next_state = encode_state(user, suggested_profile)
+            # Get user's response
+            suggested_profile = profiles.pop()
+            response = simulator.decision(user, suggested_profile)
+            reward = 10 if response else -5
+            if response:
+                accepts += 1
 
-            else:
-                # If no profile is suggested, the state remains the same
-                next_state = state
-                reward = 0
+            # Encode the new state based on the user's response
+            next_state = encode_state(user, suggested_profile)
 
-            # Determine if this is the end of the episode
-            final = _ == episode_length - 1  # Check if this is the last suggestion in the episode
+        else:
+            # If no profile is suggested, the state remains the same
+            next_state = state
+            reward = 0
 
-            # Remember the experience
-            agent.remember(state, action, reward, next_state, final)
+        # Determine if this is the end of the episode
+        final = _ == episode_length - 1  # Check if this is the last suggestion in the episode
 
-            # Set the current state to the new state
-            state = next_state
+        # Remember the experience
+        agent.remember(state, action, reward, next_state, final)
 
-        if suggested != 0:
-            print("accepts ", accepts/suggested)
+        # Set the current state to the new state
+        state = next_state
 
-        # Update the agent at the end of each episode
-        agent.replay(32)
+    # Update the agent at the end of each episode
+    agent.replay(32)
+
+if suggested != 0:
+    print("accepts ", accepts)
+    print("suggested ", suggested)
 
 plt.plot(agent.losses)
 plt.xlabel('Step')
 plt.ylabel('Loss')
-plt.title('Training Loss')
+plt.title('Learning Loss')
 plt.show()
 
 # # Save the trained model
