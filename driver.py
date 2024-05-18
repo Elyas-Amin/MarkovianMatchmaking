@@ -1,9 +1,5 @@
-import sqlite3
-import random
-import json
 from generator import generate_profile
 from simulator import Simulator
-from Profile import Profile
 from csp import CSP
 from drl import DQNAgent
 import matplotlib.pyplot as plt
@@ -11,7 +7,7 @@ import matplotlib.pyplot as plt
 user = generate_profile()
 profiles = []
 
-num = 500
+num = 10000
 for _ in range(num):
     profiles.append(generate_profile())
 
