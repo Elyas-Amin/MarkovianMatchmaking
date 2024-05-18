@@ -38,7 +38,7 @@ def generate_profile():
         "education_pref": p_char.e[np.random.randint(len(p_char.e)-1)::]
     }
 
-    threshold = np.random.beta(6, 3, size=None) # Generate acceptance threshold
+    threshold = np.random.beta(5, 3, size=None) # Generate acceptance threshold
 
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
 

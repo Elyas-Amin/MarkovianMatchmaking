@@ -24,12 +24,17 @@ class Simulator:
         '''Tick-based simulation of user deciding on each profile from set of profiles'''
         accepts = set()
         rejects = set()
+        running_times = []
+        counter = 0
 
         while profiles:
             profile = profiles.pop()
             if self.decision(user, profile):
                 accepts.add(profile)
+                running_times.append(counter)
+                counter = 0
             else:
                 rejects.add(profile)
+                counter += 1
 
-        return accepts, rejects
+        return accepts, rejects, running_times

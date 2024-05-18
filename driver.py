@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 user = generate_profile()
 profiles = []
 
-num = 10000
+num = 1000
 for _ in range(num):
     profiles.append(generate_profile())
 
