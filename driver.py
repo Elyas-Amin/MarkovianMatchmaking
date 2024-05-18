@@ -43,7 +43,7 @@ drl_accepts, drl_suggested = agent.unsupervised_learning(user, profiles.copy(), 
 
 print(user)
 print(len(rand_accepts)/num)
-print(len(csp_accepts)/len(match_set))
+print(len((csp_accepts)/len(match_set)) if len(match_set) == 0 else 0)
 print(drl_accepts, drl_suggested)
 
 plt.plot(agent.losses)
