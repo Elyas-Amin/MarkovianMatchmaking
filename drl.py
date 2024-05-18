@@ -94,8 +94,10 @@ class DQNAgent:
             self.epsilon *= self.epsilon_decay
 
     def unsupervised_learning(self, user, profiles, simulator):
-        suggested = 0
-        accepts = 0
+        suggested = set()
+        accepts = set()
+        running_times = []
+        counter = 0
         
         while profiles:
             # 20 profiles per episode
@@ -108,13 +110,16 @@ class DQNAgent:
                 state = self.encode_state(user, match)
                 action = self.act(state)
                 if action == 1:
-                    suggested += 1
+                    suggested.add(match)
+                    counter += 1
 
                     # Get user's response
                     response = simulator.decision(user, match)
                     reward = 10 if response else -5
                     if response:
-                        accepts += 1
+                        accepts.add(match)
+                        running_times.append(counter)
+                        counter = 0
 
                     # Encode the new state based on the user's response
                     next_state = self.encode_state(user, match)
@@ -133,7 +138,7 @@ class DQNAgent:
             # Update the agent at the end of each episode
             self.replay(30)
 
-        return accepts, suggested
+        return accepts, suggested, running_times
     
     def save_model(self, filename):
         self.model.save(filename)

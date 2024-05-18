@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 user = generate_profile()
 profiles = []
 
-num = 1000
+num = 500
 for _ in range(num):
     profiles.append(generate_profile())
 
@@ -33,14 +33,14 @@ simulation = Simulator()
 agent = DQNAgent()
 
 # Simulate the user's decisions
-rand_accepts, rand_rejects = simulation.simulation(user, profiles.copy())
-csp_accepts, csp_rejects = simulation.simulation(user, list(match_set))
-drl_accepts, drl_suggested = agent.unsupervised_learning(user, profiles.copy(), simulation)
+rand_accepts, rand_rejects, rand_rt = simulation.simulation(user, profiles.copy())
+csp_accepts, csp_rejects, csp_rt = simulation.simulation(user, list(match_set))
+drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
 
 print(user)
-print(len(rand_accepts)/num)
-print(len((csp_accepts)/len(match_set)) if len(match_set) == 0 else 0)
-print(drl_accepts, drl_suggested)
+print(len(rand_accepts)/num, sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
+print(len((csp_accepts))/len(match_set) if len(match_set) > 0 else 0, sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
+print(len(drl_accepts)/len(drl_suggested), sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
 
 plt.plot(agent.losses)
 plt.xlabel('Step')
