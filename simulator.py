@@ -20,7 +20,7 @@ class Simulator:
         print("acc ", acceptance_score)
 
         # Make decision based on acceptance score
-        return (acceptance_score + np.random.uniform(-0.05, 0.05)) >= 0.5
+        return (acceptance_score + np.random.uniform(-0.02, 0.02)) >= 0.5
 
     # def decision(self, user: Profile, profile: Profile):
     #     '''Decisions are made based on compatibility score following a sigmoid function'''
