@@ -71,9 +71,12 @@ for var, profiles in matches.items():
 simulation = Simulator()
 
 # Simulate the user's decisions
-accepts, rejects = simulation.simulation(user_profile, list(match_set))
+rand_accepts, rand_rejects = simulation.simulation(user_profile, other_profiles_instances)
+csp_accepts, csp_rejects = simulation.simulation(user_profile, list(match_set))
+
 print(user_profile)
-print(len(match_set))
-print(len(accepts)/len(match_set), len(rejects)/len(match_set))
+# print(len(match_set))
+print(len(rand_accepts)/10000)
+print(len(csp_accepts)/len(match_set))
 
 
