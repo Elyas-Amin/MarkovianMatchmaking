@@ -2,6 +2,9 @@ import numpy as np
 import uuid
 import sqlite3
 import json
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 from Profile import Profile
 import prof_char as p_char
@@ -24,6 +27,7 @@ def generate_profile():
             tag = p_char.t[np.random.randint(len(p_char.t)-1)]
         tags_to_add.add(tag)
     
+    #add random zodiacs
     zodiacs_to_add = set()
     for i in range(np.random.randint(len(p_char.z))):
         z = p_char.z[np.random.randint(len(p_char.z)-1)]
@@ -31,6 +35,8 @@ def generate_profile():
             z = p_char.z[np.random.randint(len(p_char.z)-1)]
         zodiacs_to_add.add(z)
 
+
+    #should this be expanded?
     preferences = {
         "age_range": 5 + abs(int(np.random.normal(0,8))),
         "religion_pref": p_char.r_pref[np.random.randint(len(p_char.r_pref))-1],
@@ -40,34 +46,24 @@ def generate_profile():
 
     threshold = np.random.beta(5, 3, size=None) # Generate acceptance threshold
 
+    #create profile object
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
 
     return p
 
 def generate_database(size):
-    # Connect to the SQLite database
-    conn = sqlite3.connect('profiles.db')
-    c = conn.cursor()
-
-    # Create a table to store the profiles
-    c.execute('''CREATE TABLE IF NOT EXITS profiles
-                 (id TEXT, age INTEGER, religion TEXT, location TEXT, aodiac TEXT, education_level TEXT, preferences TEXT, tags TEXT)''')
-     
-    # Generate and insert profiles into the database
+    profiles_dict = []
     for x in range(size):
-        profile = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
-        # Convert preferences and tags to JSON strings
-        preferences_json = json.dumps(profile.preferences)
-        tags_json = json.dumps(list(profile.tags))
-        c.execute("INSERT INTO profiles (id, age, religion, location, zodiac, education_level, preferences, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                  (profile.id, profile.age, profile.religion, profile.location, profile.zodiac, profile.education_level, preferences_json, tags_json))
-
-    # Commit changes and close the connection
-    conn.commit()
-    conn.close()
-
-# Example usage
-# generate_database(100000)
+        p = generate_profile()
+        profiles_dict.append(p.to_dict())
+        
+    df = pd.DataFrame(profiles_dict)
+    # Explicitly cast columns to correct types
+    table = pa.Table.from_pandas(df)
+    pq.write_table(table, "profiles.parquet")
+    
+#Example usage
+generate_database(1000000)
 
 # for _ in range(50):
 #     print(generate_profile())

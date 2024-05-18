@@ -1,5 +1,6 @@
 from Profile import Profile
 from simulator import Simulator
+from retriever import Retriever
 import sqlite3
 import json
 import random
@@ -25,7 +26,7 @@ class CSP:
             return potential_match.education_level in var_constraints if not potential_match.preferences["education_pref"] else True
         elif var == "tag_similarity":
             # print(user.preferences["tag_similarity"])
-            return False if user.preferences["tag_similarity"] <= 2 else True
+            return False if user.preferences["tag_similarity"] <= 1 else True
         
     def forward_checking(self, user, updated_variables, var, potential_match, user_constraints, profiles):
         #What is the base case?
@@ -41,19 +42,24 @@ class CSP:
             
         return True
 
-    def match_profiles(self, user, profiles, user_matches):
-        constraints = user.preferences
+    def match_profiles(self, user, profiles):
+        #set up dictionary to store where potential_match will fit in the user preferences
+        user_matches =  {"age_range": [],
+                         "zodiac_pref": [],
+                         "education_pref": [],
+                         "tag_similarity" : []}
 
+        constraints = user.preferences
         var_count = 0
         for potential_match in profiles:
             user.tag_overlap(potential_match) #get the tag similarity between user and profile
             self.match_profiles_helper(user, profiles, potential_match, constraints, var_count, user_matches)
-        
         return user_matches
   
     
     def match_profiles_helper(self, user, profiles, potential_match, constraints, var_count, matches):
         if var_count == 4: #base case
+            print(matches)
             return matches
         updated_variables = list(matches.keys())
         for var in matches.keys():
@@ -77,54 +83,29 @@ class CSP:
 if __name__ == "__main__":
     csp = CSP()
     sim = Simulator()
-
-    conn = sqlite3.connect('profiles.db')
-    c = conn.cursor()
-
-    # c.execute("SELECT id FROM profiles")
-    # all_profile_ids = [row[0] for row in c.fetchall()]
-
-    # Select 1000 random profiles excluding the user profile
-    # random_profiles = random.sample([id for id in all_profile_ids], 1000)
-
+    ret = Retriever()
 
     START_TIME = timeit.default_timer()
-    c.execute("SELECT * FROM profiles ORDER BY id LIMIT 100")
-    random_profiles = c.fetchall()
 
-    profiles = []
-    counter1 =0
-    for profile_tuple in random_profiles:
-        profile_id = profile_tuple[0]  # Extracting the id from the tuple
-        c.execute("SELECT * FROM profiles WHERE id=?", [profile_id])
-        profile_row = c.fetchone()
-        preferences = json.loads(profile_row[6])
-        profile_instance = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences)
-        profiles.append(profile_instance)
-        counter1+=1
-        print(counter1)
-
-    conn.close()
-
-    matches = {}
-
-    counter = 0
-    for user in profiles:
-        user_matches = {
-            "age_range": [],
-            # "religion_pref": [],
-            "zodiac_pref": [],
-            "education_pref": [],
-            # "tag_similarity" : []
-        }
-        profile_copy = profiles.copy()
-        profile_copy.remove(user)
-        matches[user] = csp.match_profiles(user, profile_copy, user_matches)
-        print(user.preferences)
-        counter+=1
-        print(counter)
+    user = ret.retrieve_by_location("New York", 1)[0]
+    profiles = ret.retrieve_by_location("New York", 100000)
+    
+    while user in profiles:
+        user = ret.retrieve_by_location("New York", 1)[0]
+        
+    profile_copy = profiles.copy()
+    matches = csp.match_profiles(user, profile_copy)
     STOP_TIME = timeit.default_timer()
 
+    match_set = set() #storing the matches
+
+    for var, profs in matches.items():
+        for p in profs:
+            if p not in match_set:
+                match_set.add(p)
+
+    print(len(match_set))
+    
     # final_matches = {}
 
     # for user, var_dict in matches.items():
@@ -144,9 +125,7 @@ if __name__ == "__main__":
     #     print(round(len(simulation_test[0])/sum_total, 3), round(len(simulation_test[1])/sum_total, 3))
     #     # print(user.id, len(match_set))
     
-
-    
-    # print(STOP_TIME-START_TIME)
+    print(STOP_TIME-START_TIME)
 
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 class Profile:
     def __init__(self, id: int, age: int, religion: str, location: str, zodiac:str, education_level: str, tags: set, preferences, threshold: float):
@@ -26,7 +27,8 @@ class Profile:
         # Calculate age difference score
         age_score = 1 / (1 + abs(self.age - match.age))
 
-        # Calculate preferences compatibility
+        # Calculate preferences compatibility.
+        #Can we jsutify weights adn calues with a survey/research study?
         pref_score = 0
         if match.zodiac in self.preferences["zodiac_pref"]:
             pref_score += 1
@@ -46,7 +48,24 @@ class Profile:
         compatibility_score = w1 * tag_score + w2 * age_score + w3 * pref_score  # Adjust weights as needed
 
         return compatibility_score
-
+    
+    def to_dict(self):
+        # Convert preferences dictionary to JSON string
+        temp = list(self.preferences["zodiac_pref"])
+        temp2 = self.preferences
+        temp2["zodiac_pref"] = temp
+        preferences_json = json.dumps(self.preferences)
+        return {
+            'id': self.id,
+            'age': self.age,
+            'religion': self.religion,
+            'location': self.location,
+            'zodiac': self.zodiac,
+            'education_level': self.education_level,
+            'preferences': preferences_json,
+            'tags': list(self.tags),
+            'threshold': self.threshold
+        }
     
     def __repr__(self):
         return f'\[{self.id}, {self.age}, {self.religion}, {self.location}, {self.zodiac}, {self.education_level}, {self.tags}, {self.preferences}, {self.threshold}\]'

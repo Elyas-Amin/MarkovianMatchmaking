@@ -3,31 +3,31 @@ from simulator import Simulator
 from csp import CSP
 from drl import DQNAgent
 import matplotlib.pyplot as plt
+from retriever import Retriever
 
-user = generate_profile()
-profiles = []
+#size and location
+num = 100
+city = "New York"
 
-num = 2000
-for _ in range(num):
-    profiles.append(generate_profile())
-
+#generate the user
+retriever = Retriever()
+user = retriever.retrieve_by_location("New York", 1)[0]
 csp = CSP()
 
-user_matches = {
-    "age_range": [],
-    "zodiac_pref": [],
-    "education_pref": [],
-    "tag_similarity" : []
-}
+print(user)
+#get list of profiles based on city and num
+profiles = retriever.retrieve_by_location(city, num, user)
 
-matches = csp.match_profiles(user, profiles.copy(), user_matches)
-match_set = set()
+#match with CSP
+matches = csp.match_profiles(user, profiles.copy())
+match_set = set() #storing the matches
+
 for var, profs in matches.items():
     for p in profs:
         if p not in match_set:
             match_set.add(p)
 
-
+print(len(match_set))
 # Initialize the simulator
 simulation = Simulator()
 agent = DQNAgent()
