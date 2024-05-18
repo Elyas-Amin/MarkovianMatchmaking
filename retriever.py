@@ -28,7 +28,7 @@ class Retriever:
         user_preferences = json.loads(user_row[6])
 
         # Create a Profile instance for the user
-        user = Profile(user_row[0], user_row[1], user_row[2], user_row[3], user_row[4], user_row[5], user_preferences)
+        user = Profile(user_row[0], user_row[1], user_row[2], user_row[3], user_row[4], user_row[5], user_preferences, user_row[8])
 
         # Fetch the other profiles and convert them to Profile instances
         other_profiles_instances = []
@@ -36,7 +36,7 @@ class Retriever:
             c.execute("SELECT * FROM profiles WHERE id=?", (profile_id,))
             profile_row = c.fetchone()
             preferences = json.loads(profile_row[6])
-            p = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences)
+            p = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences, profile_row[8])
             other_profiles_instances.append(p)
 
         # Close the connection

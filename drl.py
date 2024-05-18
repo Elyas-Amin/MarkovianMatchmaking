@@ -2,6 +2,7 @@ import numpy as np
 import keras
 from simulator import Simulator
 import random
+from generator import generate_profile
 from visualizer import QValuesVisualizer
 import matplotlib.pyplot as plt
 
@@ -97,8 +98,8 @@ class DQNAgent:
         accepts = 0
         
         while profiles:
-            # 10 profiles per episode
-            for _ in range(10):
+            # 20 profiles per episode
+            for _ in range(20):
                 if len(profiles) == 0:
                     break
 
@@ -111,7 +112,7 @@ class DQNAgent:
 
                     # Get user's response
                     response = simulator.decision(user, match)
-                    reward = 100 if response else -5
+                    reward = 10 if response else -5
                     if response:
                         accepts += 1
 
@@ -124,38 +125,32 @@ class DQNAgent:
                     reward = 0
 
                 # Remember the experience
-                agent.remember(state, action, reward, next_state)
+                self.remember(state, action, reward, next_state)
 
                 # Set the current state to the new state
                 state = next_state
 
             # Update the agent at the end of each episode
-            agent.replay(30)
-
-        plt.plot(self.losses)
-        plt.xlabel('Step')
-        plt.ylabel('Loss')
-        plt.title('Learning Loss')
-        plt.show()
+            self.replay(30)
 
         return accepts, suggested
     
     def save_model(self, filename):
         self.model.save(filename)
 
+if __name__ == "__main__":
+    # Initialize the environment and DRL agent
+    agent = DQNAgent()
+    simulator = Simulator()
 
-# Initialize the environment and DRL agent
-agent = DQNAgent()
-simulator = Simulator()
+    user = generate_profile()
+    profiles = []
 
-user = generate_profile()
-profiles = []
+    for _ in range(500):
+        profiles.append(generate_profile())
 
-for _ in range(2000):
-    profiles.append(generate_profile())
+    accepts, suggested = agent.unsupervised_learning(user, profiles, simulator)
 
-accepts, suggested = agent.unsupervised_learning(user, profiles, simulator)
-
-print(user)
-print("accepts ", accepts)
-print("suggested ", suggested)
+    print(user)
+    print("accepts ", accepts)
+    print("suggested ", suggested)

@@ -6,6 +6,7 @@ from simulator import Simulator
 from Profile import Profile
 from csp import CSP
 from drl import DQNAgent
+import matplotlib.pyplot as plt
 
 # # Connect to the SQLite database
 # conn = sqlite3.connect('profiles.db')
@@ -43,12 +44,12 @@ from drl import DQNAgent
 # # Close the connection
 # conn.close()
 
-user_profile = generate_profile()
-other_profiles_instances = []
+user = generate_profile()
+profiles = []
 
 num = 1000
 for _ in range(num):
-    other_profiles_instances.append(generate_profile())
+    profiles.append(generate_profile())
 
 csp = CSP()
 
@@ -59,10 +60,10 @@ user_matches = {
     "tag_similarity" : []
 }
 
-matches = csp.match_profiles(user_profile, other_profiles_instances, user_matches)
+matches = csp.match_profiles(user, profiles.copy(), user_matches)
 match_set = set()
-for var, profiles in matches.items():
-    for p in profiles:
+for var, profs in matches.items():
+    for p in profs:
         if p not in match_set:
             match_set.add(p)
 
@@ -72,14 +73,17 @@ simulation = Simulator()
 agent = DQNAgent()
 
 # Simulate the user's decisions
-rand_accepts, rand_rejects = simulation.simulation(user_profile, other_profiles_instances)
-csp_accepts, csp_rejects = simulation.simulation(user_profile, list(match_set))
-drl_accepts, drl_suggested = agent.unsupervised_learning(user_profile, other_profiles_instances, simulation)
+rand_accepts, rand_rejects = simulation.simulation(user, profiles.copy())
+csp_accepts, csp_rejects = simulation.simulation(user, list(match_set))
+drl_accepts, drl_suggested = agent.unsupervised_learning(user, profiles.copy(), simulation)
 
-print(user_profile)
-# print(len(match_set))
+print(user)
 print(len(rand_accepts)/num)
 print(len(csp_accepts)/len(match_set))
-print(drl_accepts/drl_suggested)
+print(drl_accepts, drl_suggested)
 
-
+plt.plot(agent.losses)
+plt.xlabel('Step')
+plt.ylabel('Loss')
+plt.title('Learning Loss')
+plt.show()
