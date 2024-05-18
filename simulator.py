@@ -7,17 +7,20 @@ class Simulator:
 
     def decision(self, user: Profile, profile: Profile):
         '''Decisions are made based on compatibility score following a sigmoid function'''
+        if user.location != profile.location:
+            return False
         compatibility_score = user.compute_compatibility(profile)
         
-        # Define scaling factor and shifting constant
+        # Sigmoid scaling factor and shifting constant
         a = 1  # shape of the sigmoid
-        b = -0.4  # x-axis shift
+        b = user.threshold # x-axis shift
 
         # Calculate acceptance probability
         acceptance_score= 1 / (1 + np.exp(-a * compatibility_score + b))
+        print("acc ", acceptance_score)
 
-        # Make decision based on acceptance probability
-        return acceptance_score >= user.threshold
+        # Make decision based on acceptance score
+        return (acceptance_score + np.random.uniform(-0.05, 0.05)) >= 0.5
 
     # def decision(self, user: Profile, profile: Profile):
     #     '''Decisions are made based on compatibility score following a sigmoid function'''
