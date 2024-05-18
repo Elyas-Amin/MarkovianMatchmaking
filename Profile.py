@@ -19,17 +19,17 @@ class Profile:
     def compute_compatibility(self, match):
         # Calculate tag similarity
         tag_score = len(self.tags.intersection(match.tags)) / 10
+        # tag_score = 1 / (1 + np.exp(-1 * len(self.tags.intersection(match.tags)) + 5))
 
         # Calculate age difference score
-        age_diff = abs(self.age - match.age)
-        age_score = 1 / (1 + age_diff) if age_diff < self.preferences["age_range"] else 0
+        age_score = 1 / (1 + abs(self.age - match.age))
 
         # Calculate preferences compatibility
         pref_score = 0
         if match.zodiac in self.preferences["zodiac_pref"]:
             pref_score += 1
         if match.education_level in self.preferences["education_pref"]:
-            pref_score += 1
+            pref_score += 2
         if self.preferences["religion_pref"] == "open to all":
             pref_score += 1
         else:
@@ -38,11 +38,11 @@ class Profile:
         pref_score /= 3
 
         # Combine scores with weights
-        w1 = 0.3
+        w1 = 0.4
         w2 = 0.2
-        w3 = 0.5
+        w3 = 0.4
         compatibility_score = w1 * tag_score + w2 * age_score + w3 * pref_score  # Adjust weights as needed
-
+        print(compatibility_score)
         return compatibility_score
 
     
