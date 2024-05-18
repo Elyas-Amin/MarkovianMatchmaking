@@ -8,46 +8,10 @@ from csp import CSP
 from drl import DQNAgent
 import matplotlib.pyplot as plt
 
-# # Connect to the SQLite database
-# conn = sqlite3.connect('profiles.db')
-# c = conn.cursor()
-
-# # Get the list of all profile IDs
-# c.execute("SELECT id FROM profiles")
-# all_profile_ids = [row[0] for row in c.fetchall()]
-
-# # Select a random user profile ID
-# user_profile_id = random.choice(all_profile_ids)
-
-# # Select 100 random profiles excluding the user profile
-# other_profiles = random.sample([id for id in all_profile_ids if id != user_profile_id], 1000)
-
-# # Fetch the user profile
-# c.execute("SELECT * FROM profiles WHERE id=?", (user_profile_id,))
-# user_row = c.fetchone()
-
-# # Parse the preferences column from JSON to dictionary
-# preferences = json.loads(user_row[6])  # Assuming preferences is the 7th column (index 6)
-
-# # Create a Profile instance for the user
-# user_profile = Profile(user_row[0], user_row[1], user_row[2], user_row[3], user_row[4], user_row[5], preferences)
-
-# # Fetch the other profiles and convert them to Profile instances
-# other_profiles_instances = []
-# for profile_id in other_profiles:
-#     c.execute("SELECT * FROM profiles WHERE id=?", (profile_id,))
-#     profile_row = c.fetchone()
-#     preferences = json.loads(profile_row[6])
-#     profile_instance = Profile(profile_row[0], profile_row[1], profile_row[2], profile_row[3], profile_row[4], profile_row[5], preferences)
-#     other_profiles_instances.append(profile_instance)
-
-# # Close the connection
-# conn.close()
-
 user = generate_profile()
 profiles = []
 
-num = 1000
+num = 500
 for _ in range(num):
     profiles.append(generate_profile())
 
