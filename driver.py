@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 user = generate_profile()
 profiles = []
 
-num = 10000
+num = 1000
 for _ in range(num):
     profiles.append(generate_profile())
 
@@ -22,6 +22,7 @@ user_matches = {
 
 matches = csp.match_profiles(user, profiles.copy(), user_matches)
 match_set = set()
+
 for var, profs in matches.items():
     for p in profs:
         if p not in match_set:

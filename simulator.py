@@ -12,13 +12,13 @@ class Simulator:
         
         # Sigmoid scaling factor and shifting constant
         a = 1  # shape of the sigmoid
-        b = user.threshold # x-axis shift
+        b = user.threshold # x-axis shift adjsut the sigmoid so the center is tat hte htreshold
 
-        # Calculate acceptance probability
+        # Calculate acceptance probability, function for sigmoid function
         acceptance_score= 1 / (1 + np.exp(-a * compatibility_score + b))
 
-        # Make decision based on acceptance score
-        return (acceptance_score + np.random.normal(0, 0.01)) >= 0.5
+        # Make decision based on acceptance score + value for variability when vlaue is close to the threshold
+        return (acceptance_score + np.random.normal(-0.01, 0.01)) >= 0.5
 
     def simulation(self, user: Profile, profiles):
         '''Tick-based simulation of user deciding on each profile from set of profiles'''

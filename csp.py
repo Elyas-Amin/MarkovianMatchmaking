@@ -25,7 +25,7 @@ class CSP:
             return potential_match.education_level in var_constraints if not potential_match.preferences["education_pref"] else True
         elif var == "tag_similarity":
             # print(user.preferences["tag_similarity"])
-            return False if user.preferences["tag_similarity"] <= 2 else True
+            return False if user.preferences["tag_similarity"] <= 1 else True
         
     def forward_checking(self, user, updated_variables, var, potential_match, user_constraints, profiles):
         #What is the base case?

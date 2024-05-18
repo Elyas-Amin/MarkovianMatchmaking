@@ -23,7 +23,8 @@ class Profile:
         # Calculate age difference score
         age_score = 1 / (1 + abs(self.age - match.age))
 
-        # Calculate preferences compatibility
+        # Calculate preferences compatibility.
+        #Can we jsutify weights adn calues with a survey/research study?
         pref_score = 0
         if match.zodiac in self.preferences["zodiac_pref"]:
             pref_score += 1

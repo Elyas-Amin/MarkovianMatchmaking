@@ -24,6 +24,7 @@ def generate_profile():
             tag = p_char.t[np.random.randint(len(p_char.t)-1)]
         tags_to_add.add(tag)
     
+    #add random zodiacs
     zodiacs_to_add = set()
     for i in range(np.random.randint(len(p_char.z))):
         z = p_char.z[np.random.randint(len(p_char.z)-1)]
@@ -31,6 +32,8 @@ def generate_profile():
             z = p_char.z[np.random.randint(len(p_char.z)-1)]
         zodiacs_to_add.add(z)
 
+
+    #should this be expanded?
     preferences = {
         "age_range": 5 + abs(int(np.random.normal(0,8))),
         "religion_pref": p_char.r_pref[np.random.randint(len(p_char.r_pref))-1],
@@ -38,8 +41,10 @@ def generate_profile():
         "education_pref": p_char.e[np.random.randint(len(p_char.e)-1)::]
     }
 
-    threshold = np.random.beta(6, 3, size=None) # Generate acceptance threshold
+    # Generate acceptance threshold
+    threshold = np.random.beta(6, 3, size=None) 
 
+    #create profile object
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
 
     return p
