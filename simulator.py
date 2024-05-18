@@ -28,7 +28,7 @@ class Simulator:
         while profiles:
             profile = profiles.pop()
             if self.decision(user, profile):
-                accepts.add(profile)
+                accepts.add(profile) 
             else:
                 rejects.add(profile)
 

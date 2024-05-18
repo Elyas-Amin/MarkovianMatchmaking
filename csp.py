@@ -43,7 +43,6 @@ class CSP:
 
     def match_profiles(self, user, profiles, user_matches):
         constraints = user.preferences
-
         var_count = 0
         for potential_match in profiles:
             user.tag_overlap(potential_match) #get the tag similarity between user and profile
@@ -54,6 +53,7 @@ class CSP:
     
     def match_profiles_helper(self, user, profiles, potential_match, constraints, var_count, matches):
         if var_count == 4: #base case
+            print(matches)
             return matches
         updated_variables = list(matches.keys())
         for var in matches.keys():
@@ -112,10 +112,9 @@ if __name__ == "__main__":
     for user in profiles:
         user_matches = {
             "age_range": [],
-            # "religion_pref": [],
             "zodiac_pref": [],
             "education_pref": [],
-            # "tag_similarity" : []
+            "tag_similarity" : []
         }
         profile_copy = profiles.copy()
         profile_copy.remove(user)
