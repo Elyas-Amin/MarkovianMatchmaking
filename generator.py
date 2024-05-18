@@ -64,7 +64,7 @@ def generate_database(size):
     pq.write_table(table, "profiles.parquet")
     
 #Example usage
-generate_database(100000)
+generate_database(1000000)
 
 # for _ in range(50):
 #     print(generate_profile())
