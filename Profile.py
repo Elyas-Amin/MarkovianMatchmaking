@@ -42,7 +42,7 @@ class Profile:
         w2 = 0.2
         w3 = 0.4
         compatibility_score = w1 * tag_score + w2 * age_score + w3 * pref_score  # Adjust weights as needed
-        print(compatibility_score)
+
         return compatibility_score
 
     

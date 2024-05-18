@@ -17,7 +17,6 @@ class Simulator:
 
         # Calculate acceptance probability
         acceptance_score= 1 / (1 + np.exp(-a * compatibility_score + b))
-        print("acc ", acceptance_score)
 
         # Make decision based on acceptance score
         return (acceptance_score + np.random.uniform(-0.02, 0.02)) >= 0.5
