@@ -95,9 +95,10 @@ class DQNAgent:
     def unsupervised_learning(self, user, profiles, simulator):
         suggested = 0
         accepts = 0
+        
         while profiles:
-            # 20 profiles per episode
-            for _ in range(20):
+            # 10 profiles per episode
+            for _ in range(10):
                 if len(profiles) == 0:
                     break
 
@@ -131,6 +132,12 @@ class DQNAgent:
             # Update the agent at the end of each episode
             agent.replay(30)
 
+        plt.plot(self.losses)
+        plt.xlabel('Step')
+        plt.ylabel('Loss')
+        plt.title('Learning Loss')
+        plt.show()
+
         return accepts, suggested
     
     def save_model(self, filename):
@@ -141,27 +148,14 @@ class DQNAgent:
 agent = DQNAgent()
 simulator = Simulator()
 
-# # Fetch user and profiles from the database
-# retriever = Retriever()
-# training_set = []
-# for _ in range(1):
-#     training_set.append(retriever.random_profiles(1000))
+user = generate_profile()
+profiles = []
 
-
-user = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
-profiles = set()
-
-for _ in range(1000):
-    profiles.add(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
+for _ in range(2000):
+    profiles.append(generate_profile())
 
 accepts, suggested = agent.unsupervised_learning(user, profiles, simulator)
 
 print(user)
 print("accepts ", accepts)
 print("suggested ", suggested)
-
-plt.plot(agent.losses)
-plt.xlabel('Step')
-plt.ylabel('Loss')
-plt.title('Learning Loss')
-plt.show()

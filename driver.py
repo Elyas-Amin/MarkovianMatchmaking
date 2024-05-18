@@ -2,10 +2,10 @@ import sqlite3
 import random
 import json
 from generator import generate_profile
-import prof_char as p_char
 from simulator import Simulator
 from Profile import Profile
 from csp import CSP
+from drl import DQNAgent
 
 # # Connect to the SQLite database
 # conn = sqlite3.connect('profiles.db')
@@ -43,11 +43,12 @@ from csp import CSP
 # # Close the connection
 # conn.close()
 
-user_profile = generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t)
+user_profile = generate_profile()
 other_profiles_instances = []
 
-for _ in range(100000):
-    other_profiles_instances.append(generate_profile(p_char.r, p_char.l, p_char.z, p_char.e, p_char.t))
+num = 1000
+for _ in range(num):
+    other_profiles_instances.append(generate_profile())
 
 csp = CSP()
 
@@ -68,14 +69,17 @@ for var, profiles in matches.items():
 
 # Initialize the simulator
 simulation = Simulator()
+agent = DQNAgent()
 
 # Simulate the user's decisions
 rand_accepts, rand_rejects = simulation.simulation(user_profile, other_profiles_instances)
 csp_accepts, csp_rejects = simulation.simulation(user_profile, list(match_set))
+drl_accepts, drl_suggested = agent.unsupervised_learning(user_profile, other_profiles_instances, simulation)
 
 print(user_profile)
 # print(len(match_set))
-print(len(rand_accepts)/100000)
+print(len(rand_accepts)/num)
 print(len(csp_accepts)/len(match_set))
+print(drl_accepts/drl_suggested)
 
 
