@@ -44,7 +44,7 @@ def generate_profile():
         "education_pref": p_char.e[np.random.randint(len(p_char.e)-1)::]
     }
 
-    threshold = np.random.beta(5, 3, size=None) # Generate acceptance threshold
+    threshold = np.random.beta(2, 3, size=None) # Generate acceptance threshold
 
     #create profile object
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
@@ -62,8 +62,5 @@ def generate_database(size):
     table = pa.Table.from_pandas(df)
     pq.write_table(table, "profiles.parquet")
     
-#Example usage
-generate_database(1000000)
-
-# for _ in range(50):
-#     print(generate_profile())
+#Uncomment below to make 1,000,000 profiles. Then go to retreiver and run so that each city parquet is updated
+# generate_database(1000000)

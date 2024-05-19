@@ -9,3 +9,12 @@ Generates a given number of random profiles with randomly selected traits.
 ## CSP
 
 ## Reinforcement Learning
+
+## Packages Required
+numpy
+pandas
+pyarrow
+keras
+tensorflow
+seaborn
+imageio

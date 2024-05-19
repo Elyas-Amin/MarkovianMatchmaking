@@ -6,6 +6,35 @@ from generator import generate_profile
 import json
 
 class Retriever:
+    
+    def retrieve_profile_by_id(self, input_parquet_path, id: str):
+        #read in file
+        table = pq.read_table(input_parquet_path)
+        df = table.to_pandas()
+        # id = "740c55d8-b376-46be-929e-04cec6a26531"
+        for x in df["id"]:
+            if x == id:
+                result = df[df["id"] == id]
+        
+        if result.empty:
+            return None
+
+        row = result.iloc[0]
+        
+        preferences = json.loads(row['preferences'])
+        profile = Profile(
+            id=str(row['id']),
+            age=int(row['age']),
+            religion=row['religion'],
+            location=row['location'],
+            zodiac=row['zodiac'],
+            education_level=row['education_level'],
+            preferences=preferences,
+            tags=set(row['tags']),
+            threshold=float(row['threshold'])
+        )
+        return profile
+        
 
     def retrieve_by_location(self, city, n, user = None):
         # Read the Parquet file into a DataFrame
@@ -83,11 +112,11 @@ class Retriever:
                 threshold=float(row['threshold'])
             )
             
-        # Ensure the user profile is not included in the retrieved profiles
-        if user and profile.id != user.id:
-            profiles.append(profile)
-        elif not user:
-            profiles.append(profile)
+            # Ensure the user profile is not included in the retrieved profiles
+            if user and profile.id != user.id:
+                profiles.append(profile)
+            elif not user:
+                profiles.append(profile)
         
         return profiles  
     
@@ -101,24 +130,25 @@ class Retriever:
         
         # Write the filtered DataFrame to a new Parquet file
         city_profiles.to_parquet(output_parquet_path, index=False)
-
         
 
-if __name__ == "__main__":
-    # print("new_york_profiles.parquet")
-    # print(retriever.random_profile_chooser(user, "new_york_profiles.parquet", 10))
-    # df = pd.read_parquet("houston_profiles.parquet")
-    # print(len(df))
-    df = pd.read_parquet("new_york_profiles.parquet")
-    print(len(df))
-    # df = pd.read_parquet("la_profiles.parquet")
-    # print(len(df))
-    # df = pd.read_parquet("philly_profiles.parquet")
-    # print(len(df))
-    # df = pd.read_parquet("sf_profiles.parquet")
-    # print(len(df))
-    # df = pd.read_parquet("boston_profiles.parquet")
-    # print(len(df))
-    # df = pd.read_parquet("chi_profiles.parquet")
-    # print(len(df))
+#Update parquets from each city from new profiles_parquet
+
+
+#get lengths of each file
+# df = pd.read_parquet("houston_profiles.parquet")
+# print(len(df))
+# df = pd.read_parquet("new_york_profiles.parquet")
+# print(len(df))
+# df = pd.read_parquet("la_profiles.parquet")
+# print(len(df))
+# df = pd.read_parquet("philly_profiles.parquet")
+# print(len(df))
+# df = pd.read_parquet("sf_profiles.parquet")
+# print(len(df))
+# df = pd.read_parquet("boston_profiles.parquet")
+# print(len(df))
+# df = pd.read_parquet("chi_profiles.parquet")
+# print(len(df))
     
+ 

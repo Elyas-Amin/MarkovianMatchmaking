@@ -1,6 +1,7 @@
 from Profile import Profile
 from simulator import Simulator
 from retriever import Retriever
+import pandas as pd
 import sqlite3
 import json
 import random
@@ -9,6 +10,8 @@ import time
 
 START_TIME = 0
 STOP_TIME = 0
+START_TIME2 = 0
+STOP_TIME2 = 0
 
 class CSP:
     def __init__(self):
@@ -25,12 +28,10 @@ class CSP:
         elif var == "education_pref":
             return potential_match.education_level in var_constraints if not potential_match.preferences["education_pref"] else True
         elif var == "tag_similarity":
-            # print(user.preferences["tag_similarity"])
             return False if user.preferences["tag_similarity"] <= 1 else True
         
     def forward_checking(self, user, updated_variables, var, potential_match, user_constraints, profiles):
-        #What is the base case?
-        if not updated_variables:
+        if not updated_variables: #base case
             return True
                 
         for neighbor_var in updated_variables:
@@ -42,24 +43,19 @@ class CSP:
             
         return True
 
-    def match_profiles(self, user, profiles):
-        #set up dictionary to store where potential_match will fit in the user preferences
-        user_matches =  {"age_range": [],
-                         "zodiac_pref": [],
-                         "education_pref": [],
-                         "tag_similarity" : []}
-
+    def match_profiles(self, user, profiles, user_matches):
         constraints = user.preferences
+
         var_count = 0
         for potential_match in profiles:
             user.tag_overlap(potential_match) #get the tag similarity between user and profile
             self.match_profiles_helper(user, profiles, potential_match, constraints, var_count, user_matches)
+        
         return user_matches
   
     
     def match_profiles_helper(self, user, profiles, potential_match, constraints, var_count, matches):
         if var_count == 4: #base case
-            print(matches)
             return matches
         updated_variables = list(matches.keys())
         for var in matches.keys():
@@ -79,53 +75,47 @@ class CSP:
 
         return False
 
-
-if __name__ == "__main__":
-    csp = CSP()
-    sim = Simulator()
-    ret = Retriever()
-
-    START_TIME = timeit.default_timer()
-
-    user = ret.retrieve_by_location("New York", 1)[0]
-    profiles = ret.retrieve_by_location("New York", 100000)
+# if __name__ == "__main__":
+#     csp = CSP()
+#     sim = Simulator()
+#     ret = Retriever()
     
-    while user in profiles:
-        user = ret.retrieve_by_location("New York", 1)[0]
-        
-    profile_copy = profiles.copy()
-    matches = csp.match_profiles(user, profile_copy)
-    STOP_TIME = timeit.default_timer()
+#     df = pd.read_parquet("new_york_profiles.parquet")
+#     # print(df["id"][1])
+#     input_parquet_path = "new_york_profiles.parquet"
+#     user = ret.retrieve_profile_by_id(input_parquet_path, "a9724be6-cb70-4154-b41d-bd759ce2e00a")
+#     profiles = ret.random_profile_chooser(user, input_parquet_path, 100) #takes about 7 seconds
+#     user_matches = {
+#             "age_range": [],
+#             "zodiac_pref": [],
+#             "education_pref": [],
+#             "tag_similarity" : []
+#         }
+#     #make sure user not in profiles
+#     while user in profiles:
+#         user = ret.retrieve_by_location("New York", 1)[0]
+#     print(user)
+#     profile_copy = profiles.copy()
+#     START_TIME = timeit.default_timer()
+#     matches = csp.match_profiles(user, profile_copy, user_matches)
+#     STOP_TIME = timeit.default_timer()
+#     match_set = set() #storing the matches
+#     for var, profs in matches.items():
+#         for p in profs:
+#             if p not in match_set:
+#                 match_set.add(p)
+#     print("match_set:", len(match_set))
+#     print("CSP Run Time(s):", STOP_TIME-START_TIME)
 
-    match_set = set() #storing the matches
-
-    for var, profs in matches.items():
-        for p in profs:
-            if p not in match_set:
-                match_set.add(p)
-
-    print(len(match_set))
+#     #Run Simulation
+#     START_TIME2 = timeit.default_timer()
+#     simulation_test = sim.simulation(user, match_set)
+#     STOP_TIME2 = timeit.default_timer()
+#     print("Simulation Run Time(s):", STOP_TIME2-START_TIME2)
+#     sum_total = len(simulation_test[0]) + len(simulation_test[1])
+#     print(round(len(simulation_test[0])/sum_total, 3), round(len(simulation_test[1])/sum_total, 3))
+#     # print("RUNNING TIME:", simulation_test[2])
     
-    # final_matches = {}
-
-    # for user, var_dict in matches.items():
-    #     count = 0
-    #     if type(var_dict) == bool:
-    #         print(user.id, 0)
-    #         continue
-    #     match_set = set()
-    #     for var, profiles in var_dict.items():
-    #         for p in profiles:
-    #             if p not in match_set:
-    #                 match_set.add(p)
-    #     # print(match_set)
-    #     final_matches[user] = match_set
-    #     simulation_test = sim.simulation(user, match_set)
-    #     sum_total = len(simulation_test[0]) + len(simulation_test[1])
-    #     print(round(len(simulation_test[0])/sum_total, 3), round(len(simulation_test[1])/sum_total, 3))
-    #     # print(user.id, len(match_set))
-    
-    print(STOP_TIME-START_TIME)
 
 
 
