@@ -9,7 +9,7 @@ from retriever import Retriever
 csp = CSP()
 retriever = Retriever()
 simulation = Simulator()
-# agent = DQNAgent()
+agent = DQNAgent()
 
 #####################USER_AND_DATASET_GENERATION############
 num = 100000
@@ -44,22 +44,18 @@ for var, profs in matches.items():
         if p not in match_set:
             match_set.add(p)
 
-print("match set length:", len(match_set))
 
 
 ############RUNNING_SIMULATION###################
 rand_accepts, rand_rejects, rand_rt = simulation.simulation(user, profiles.copy())
-print("random sim done")
 csp_accepts, csp_rejects, csp_rt = simulation.simulation(user, list(match_set))
-print("csp sim done")
-print(user)
-# drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
+drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
 
 
 print(user)
-print("Accepts ", len(rand_accepts), "; Suggested ", num, "; Running Time ", sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
-print("Accepts ", len((csp_accepts)), "; Suggested ", len(match_set) if len(match_set) > 0 else 0, "; Running Time ", sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
-# print("Accepts ", len(drl_accepts), "; Suggested ", len(drl_suggested), "; Running Time ", sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
+print("RANDOM","Accepts ", len(rand_accepts), "; Suggested ", num, "; Running Time ", sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
+print("CSP","Accepts ", len((csp_accepts)), "; Suggested ", len(match_set) if len(match_set) > 0 else 0, "; Running Time ", sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
+print("DRL", "Accepts ", len(drl_accepts), "; Suggested ", len(drl_suggested), "; Running Time ", sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
 
-# agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
-# agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
+agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
+agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
