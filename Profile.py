@@ -33,7 +33,7 @@ class Profile:
         if match.zodiac in self.preferences["zodiac_pref"]:
             pref_score += 1
         if match.education_level in self.preferences["education_pref"]:
-            pref_score += 2
+            pref_score += 1
         if self.preferences["religion_pref"] == "open to all":
             pref_score += 1
         else:
