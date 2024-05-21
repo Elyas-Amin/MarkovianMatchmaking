@@ -243,11 +243,11 @@ if __name__ == "__main__":
     #User wit 0.625 (mean) threshold - b981f4d1-b649-4abb-b333-5d7dd69e8310
     #user with 0.400 (1 std dv) - 2e6a8e21-6120-467e-8e83-46fb03400682
     
-    user = retriever.retrieve_profile_by_id(input_parquet_path, "b981f4d1-b649-4abb-b333-5d7dd69e8310")
+    user = retriever.retrieve_profile_by_id(input_parquet_path, "2e6a8e21-6120-467e-8e83-46fb03400682")
     print(user)
 
     #get list of profiles based on city and num
-    profiles = retriever.retrieve_every_profile("new_york_profiles1000.parquet")
+    profiles = retriever.retrieve_every_profile("new_york_profiles10000.parquet")
 
     #make sure user not in profiles
     while user in profiles:
@@ -276,17 +276,17 @@ if __name__ == "__main__":
 
     ############RUNNING_SIMULATION###################
     rand_accepts, rand_rejects, rand_rt = simulation.simulation(user, profiles.copy())
-    print("random sim done")
+    # print("random sim done")
     csp_accepts, csp_rejects, csp_rt = simulation.simulation(user, list(match_set))
-    print("csp sim done")
+    # print("csp sim done")
     print(user)
     drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
 
 
-    print(user)
+    # print(user)
     print("Accepts ", len(rand_accepts), "; Suggested ", num, "; Running Time ", sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
     print("Accepts ", len((csp_accepts)), "; Suggested ", len(match_set) if len(match_set) > 0 else 0, "; Running Time ", sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
     print("Accepts ", len(drl_accepts), "; Suggested ", len(drl_suggested), "; Running Time ", sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
 
-    agent.visualize_q_values(agent.q_value_frames, 'Q_vis_mean_1000_1.gif')
-    agent.save_loss_plot(agent.losses, 'LL_mean_1000_1.png')
+    agent.visualize_q_values(agent.q_value_frames, 'Q_vis_low_10000_4.gif')
+    agent.save_loss_plot(agent.losses, 'LL_low_10000_4.png')
