@@ -133,22 +133,29 @@ class Retriever:
         
 
 #Update parquets from each city from new profiles_parquet
-
+# ret = Retriever()
+# ret.parquet_by_location("profiles.parquet", "new_york_profiles.parquet", "New York")
+# ret.parquet_by_location("profiles.parquet", "houston_profiles.parquet", "Houston")
+# ret.parquet_by_location("profiles.parquet", "boston_profiles.parquet", "Boston")
+# ret.parquet_by_location("profiles.parquet", "chi_profiles.parquet", "Chicago")
+# ret.parquet_by_location("profiles.parquet", "la_profiles.parquet", "Los Angeles")
+# ret.parquet_by_location("profiles.parquet", "philly_profiles.parquet", "Philadelphia")
+# ret.parquet_by_location("profiles.parquet", "sf_profiles.parquet", "San Francisco")
 
 #get lengths of each file
-# df = pd.read_parquet("houston_profiles.parquet")
-# print(len(df))
-# df = pd.read_parquet("new_york_profiles.parquet")
-# print(len(df))
-# df = pd.read_parquet("la_profiles.parquet")
-# print(len(df))
-# df = pd.read_parquet("philly_profiles.parquet")
-# print(len(df))
-# df = pd.read_parquet("sf_profiles.parquet")
-# print(len(df))
-# df = pd.read_parquet("boston_profiles.parquet")
-# print(len(df))
-# df = pd.read_parquet("chi_profiles.parquet")
-# print(len(df))
+df = pd.read_parquet("houston_profiles.parquet")
+print(len(df))
+df = pd.read_parquet("new_york_profiles.parquet")
+print(len(df))
+df = pd.read_parquet("la_profiles.parquet")
+print(len(df))
+df = pd.read_parquet("philly_profiles.parquet")
+print(len(df))
+df = pd.read_parquet("sf_profiles.parquet")
+print(len(df))
+df = pd.read_parquet("boston_profiles.parquet")
+print(len(df))
+df = pd.read_parquet("chi_profiles.parquet")
+print(len(df))
     
  
