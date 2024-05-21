@@ -4,6 +4,8 @@ from csp import CSP
 # from drl import DQNAgent
 import matplotlib.pyplot as plt
 from retriever import Retriever
+from drl import DQNAgent
+
 
 ##################INTIALIZATION#############
 csp = CSP()
