@@ -33,7 +33,7 @@ class Profile:
         if match.zodiac in self.preferences["zodiac_pref"]:
             pref_score += 1
         if match.education_level in self.preferences["education_pref"]:
-            pref_score += 2
+            pref_score += 1
         if self.preferences["religion_pref"] == "open to all":
             pref_score += 1
         else:
@@ -42,8 +42,8 @@ class Profile:
         pref_score /= 3
 
         # Combine scores with weights
-        w1 = 0.4
-        w2 = 0.2
+        w1 = 0.3
+        w2 = 0.3
         w3 = 0.4
         compatibility_score = w1 * tag_score + w2 * age_score + w3 * pref_score  # Adjust weights as needed
 

@@ -207,20 +207,20 @@ class DQNAgent:
         ''' Save the model '''
         self.model.save(filename)
 
-# if __name__ == "__main__":
-#     # Initialize the environment and DRL agent
-#     agent = DQNAgent()
-#     simulator = Simulator()
+if __name__ == "__main__":
+    # Initialize the environment and DRL agent
+    agent = DQNAgent()
+    simulator = Simulator()
 
-#     user = generate_profile()
-#     profiles = [generate_profile() for _ in range(1000)]
+    user = generate_profile()
+    profiles = [generate_profile() for _ in range(1000)]
 
-#     accepts, suggested, running_times = agent.unsupervised_learning(user, profiles, simulator)
+    accepts, suggested, running_times = agent.unsupervised_learning(user, profiles, simulator)
 
-#     print(user)
-#     print("accepts ", len(accepts))
-#     print("suggested ", len(suggested))
+    print(user)
+    print("accepts ", len(accepts))
+    print("suggested ", len(suggested))
 
-#     # Visualize Q-values evolution and learning loss
-#     agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
-#     agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
+    # Visualize Q-values evolution and learning loss
+    agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
+    agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')

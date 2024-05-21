@@ -36,7 +36,7 @@ def generate_profile():
         zodiacs_to_add.add(z)
 
 
-    #should this be expanded?
+    # preferences of the user
     preferences = {
         "age_range": 5 + abs(int(np.random.normal(0,8))),
         "religion_pref": p_char.r_pref[np.random.randint(len(p_char.r_pref))-1],
@@ -44,7 +44,7 @@ def generate_profile():
         "education_pref": p_char.e[np.random.randint(len(p_char.e)-1)::]
     }
 
-    threshold = np.random.beta(2, 3, size=None) # Generate acceptance threshold
+    threshold = np.random.beta(5, 3, size=None) # Generate acceptance threshold
 
     #create profile object
     p = Profile(id, age, religion, location, zodiac, education_level, tags_to_add, preferences, threshold)
