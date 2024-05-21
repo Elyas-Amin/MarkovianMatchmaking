@@ -42,8 +42,8 @@ class Profile:
         pref_score /= 3
 
         # Combine scores with weights
-        w1 = 0.4
-        w2 = 0.2
+        w1 = 0.3
+        w2 = 0.3
         w3 = 0.4
         compatibility_score = w1 * tag_score + w2 * age_score + w3 * pref_score  # Adjust weights as needed
 
