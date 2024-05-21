@@ -121,6 +121,35 @@ class Retriever:
         
         return profiles    
     
+    def retrieve_every_profile(self, parquet_file_path):
+        # Read the Parquet file into a DataFrame
+        df = pd.read_parquet(parquet_file_path, engine='pyarrow')
+        
+        # List to store all Profile objects
+        profiles = []
+
+        # Iterate through each row in the DataFrame
+        for index, row in df.iterrows():
+            # Parse the 'preferences' field from JSON string to a dictionary
+            preferences = json.loads(row['preferences'])
+            
+            # Create a Profile object for the current row
+            profile = Profile(
+                id=str(row['id']),
+                age=int(row['age']),
+                religion=row['religion'],
+                location=row['location'],
+                zodiac=row['zodiac'],
+                education_level=row['education_level'],
+                preferences=preferences,
+                tags=set(row['tags']),
+                threshold=float(row['threshold'])
+            )
+            
+            # Append the Profile object to the list
+            profiles.append(profile)
+        
+        return profiles
     
     def random_profile_chooser(self, user, input_parquet_path: str, n):
         # Read the Parquet file into a DataFrame
