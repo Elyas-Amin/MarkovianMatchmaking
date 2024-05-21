@@ -1,7 +1,5 @@
 import numpy as np
 import uuid
-import sqlite3
-import json
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq

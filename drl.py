@@ -9,10 +9,11 @@ import os
 import prof_char as p_char
 from simulator import Simulator
 from generator import generate_profile
+from csp import CSP
+from retriever import Retriever
 
 class DQNAgent:
     def __init__(self, max_memory_size=10000):
-        print("here")
         self.state_size = 30  # 30 features encoded in state
         self.action_size = 2  # Agent can suggest or not suggest a profile
         self.memory = []
@@ -207,20 +208,81 @@ class DQNAgent:
         ''' Save the model '''
         self.model.save(filename)
 
+# if __name__ == "__main__":
+#     # Initialize the environment and DRL agent
+#     agent = DQNAgent()
+#     simulator = Simulator()
+
+#     user = generate_profile()
+#     profiles = [generate_profile() for _ in range(1000)]
+
+#     accepts, suggested, running_times = agent.unsupervised_learning(user, profiles, simulator)
+
+#     print(user)
+#     print("accepts ", len(accepts))
+#     print("suggested ", len(suggested))
+
+#     # Visualize Q-values evolution and learning loss
+#     agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
+#     agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
+
 if __name__ == "__main__":
-    # Initialize the environment and DRL agent
+    ##################INTIALIZATION#############
+    csp = CSP()
+    retriever = Retriever()
+    simulation = Simulator()
     agent = DQNAgent()
-    simulator = Simulator()
 
-    user = generate_profile()
-    profiles = [generate_profile() for _ in range(1000)]
+    #####################USER_AND_DATASET_GENERATION############
+    num = 1000
+    city = "New York"
+    input_parquet_path = "new_york_profiles.parquet"
 
-    accepts, suggested, running_times = agent.unsupervised_learning(user, profiles, simulator)
+    #generate the user
+    user = retriever.retrieve_by_location(city, 1)[0]
+    print(user)
+
+    #get list of profiles based on city and num
+    profiles = retriever.random_profile_chooser(user, input_parquet_path, num)
+
+    #make sure user not in profiles
+    while user in profiles:
+        user = retriever.retrieve_by_location(city, 1)[0]
+
+
+    ###################CSP_SETUP##########################
+    user_matches = {
+        "age_range": [],
+        "zodiac_pref": [],
+        "education_pref": [],
+        "tag_similarity" : []}
+
+    # match with CSP
+    matches = csp.match_profiles(user, profiles.copy(), user_matches)
+    match_set = set() #storing the matches
+
+    #collect CSP matches
+    for var, profs in matches.items():
+        for p in profs:
+            if p not in match_set:
+                match_set.add(p)
+
+    print("match set length:", len(match_set))
+
+
+    ############RUNNING_SIMULATION###################
+    rand_accepts, rand_rejects, rand_rt = simulation.simulation(user, profiles.copy())
+    print("random sim done")
+    csp_accepts, csp_rejects, csp_rt = simulation.simulation(user, list(match_set))
+    print("csp sim done")
+    print(user)
+    drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
+
 
     print(user)
-    print("accepts ", len(accepts))
-    print("suggested ", len(suggested))
+    print("Accepts ", len(rand_accepts), "; Suggested ", num, "; Running Time ", sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
+    print("Accepts ", len((csp_accepts)), "; Suggested ", len(match_set) if len(match_set) > 0 else 0, "; Running Time ", sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
+    print("Accepts ", len(drl_accepts), "; Suggested ", len(drl_suggested), "; Running Time ", sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
 
-    # Visualize Q-values evolution and learning loss
     agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
     agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
