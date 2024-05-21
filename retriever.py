@@ -15,6 +15,7 @@ class Retriever:
         for x in df["id"]:
             if x == id:
                 result = df[df["id"] == id]
+                break
         
         if result.empty:
             return None
@@ -33,6 +34,47 @@ class Retriever:
             tags=set(row['tags']),
             threshold=float(row['threshold'])
         )
+        return profile
+    
+    def retrieve_profile_by_threshold(self, input_parquet_path, threshold):
+        # Read in the Parquet file
+        table = pq.read_table(input_parquet_path)
+        df = table.to_pandas()
+        
+        # Initialize result to None
+        result = None
+        
+        # Iterate through the 'threshold' column
+        for x in df["threshold"]:
+            # Check if the rounded value matches the provided threshold
+            if round(x, 3) == threshold:
+                # Filter the DataFrame based on the threshold value
+                result = df[round(df["threshold"], 3) == threshold]
+                break
+        
+        # If no matching rows found, return None
+        if result is None or result.empty:
+            return None
+        
+        # Extract the first matching row
+        row = result.iloc[0]
+        
+        # Parse the 'preferences' field from JSON string to a dictionary
+        preferences = json.loads(row['preferences'])
+        
+        # Create and return a Profile object
+        profile = Profile(
+            id=str(row['id']),
+            age=int(row['age']),
+            religion=row['religion'],
+            location=row['location'],
+            zodiac=row['zodiac'],
+            education_level=row['education_level'],
+            preferences=preferences,
+            tags=set(row['tags']),
+            threshold=float(row['threshold'])
+        )
+        
         return profile
         
 
@@ -120,7 +162,18 @@ class Retriever:
         
         return profiles  
     
-    def parquet_by_location(self, input_parquet_path, output_parquet_path, city):
+    # def parquet_by_location(self, input_parquet_path, output_parquet_path, city):
+    #     # Read the original Parquet file into a DataFrame
+    #     original_table = pq.read_table(input_parquet_path)
+    #     original_df = original_table.to_pandas()
+        
+    #     # Filter profiles by the specified city
+    #     city_profiles = original_df[original_df['location'] == city]
+        
+    #     # Write the filtered DataFrame to a new Parquet file
+    #     city_profiles.to_parquet(output_parquet_path, index=False)
+            
+    def parquet_by_location(self, input_parquet_path, output_parquet_path, city, num_profiles=None, exclude_ids=None):
         # Read the original Parquet file into a DataFrame
         original_table = pq.read_table(input_parquet_path)
         original_df = original_table.to_pandas()
@@ -128,20 +181,41 @@ class Retriever:
         # Filter profiles by the specified city
         city_profiles = original_df[original_df['location'] == city]
         
+        # Exclude the specified IDs if provided
+        if exclude_ids:
+            for exclude_id in exclude_ids:
+                if isinstance(exclude_id, str):
+                    city_profiles = city_profiles[city_profiles['id'] != exclude_id]
+        
+        # Limit the number of profiles if specified
+        if num_profiles is not None:
+            city_profiles = city_profiles.head(num_profiles)
+        
         # Write the filtered DataFrame to a new Parquet file
         city_profiles.to_parquet(output_parquet_path, index=False)
+
         
 
 #Update parquets from each city from new profiles_parquet
 # ret = Retriever()
-# ret.parquet_by_location("profiles.parquet", "new_york_profiles.parquet", "New York")
-# ret.parquet_by_location("profiles.parquet", "houston_profiles.parquet", "Houston")
-# ret.parquet_by_location("profiles.parquet", "boston_profiles.parquet", "Boston")
-# ret.parquet_by_location("profiles.parquet", "chi_profiles.parquet", "Chicago")
-# ret.parquet_by_location("profiles.parquet", "la_profiles.parquet", "Los Angeles")
-# ret.parquet_by_location("profiles.parquet", "philly_profiles.parquet", "Philadelphia")
-# ret.parquet_by_location("profiles.parquet", "sf_profiles.parquet", "San Francisco")
+# ret.parquet_by_location("new_york_profiles.parquet", "new_york_profiles1000.parquet", "New York", 1000, ["b981f4d1-b649-4abb-b333-5d7dd69e8310", "2e6a8e21-6120-467e-8e83-46fb03400682", "3b355141-1488-4cbf-a4d0-70a706d1eb10"])
+# ret.parquet_by_location("houston_profiles.parquet", "houston_profiles.parquet1000", "Houston", 1000)
+# ret.parquet_by_location("boston_profiles.parquet", "boston_profiles.parquet1000", "Boston",1000)
+# ret.parquet_by_location("chi_profiles.parquet", "chi_profiles.parquet1000", "Chicago",1000)
+# ret.parquet_by_location("la_profiles.parquet", "la_profiles.parquet1000", "Los Angeles",1000)
+# ret.parquet_by_location("philly_profiles.parquet", "philly_profiles.parquet1000", "Philadelphia",1000)
+# ret.parquet_by_location("sf_profiles.parquet", "sf_profiles.parquet1000", "San Francisco",1000)
 
+# print("done")
+
+# ret.parquet_by_location("new_york_profiles.parquet", "new_york_profiles10000.parquet", "New York", 10000, ["b981f4d1-b649-4abb-b333-5d7dd69e8310", "2e6a8e21-6120-467e-8e83-46fb03400682", "3b355141-1488-4cbf-a4d0-70a706d1eb10"])
+# ret.parquet_by_location("houston_profiles.parquet", "houston_profiles.parquet10000", "Houston", 10000)
+# ret.parquet_by_location("boston_profiles.parquet", "boston_profiles.parquet10000", "Boston",10000)
+# ret.parquet_by_location("chi_profiles.parquet", "chi_profiles.parquet10000", "Chicago",1000)
+# ret.parquet_by_location("la_profiles.parquet", "la_profiles.parquet10000", "Los Angeles",10000)
+# ret.parquet_by_location("philly_profiles.parquet", "philly_profiles.parquet10000", "Philadelphia",10000)
+# ret.parquet_by_location("sf_profiles.parquet", "sf_profiles.parquet10000", "San Francisco",10000)
+# print("done2")
 #get lengths of each file
 # df = pd.read_parquet("houston_profiles.parquet")
 # print(len(df))

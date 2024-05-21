@@ -234,55 +234,59 @@ if __name__ == "__main__":
     agent = DQNAgent()
 
     #####################USER_AND_DATASET_GENERATION############
-    num = 1000
+    num = 10000
     city = "New York"
-    input_parquet_path = "new_york_profiles.parquet"
+    input_parquet_path = "new_york_profiles1000.parquet"
 
     #generate the user
-    user = retriever.retrieve_by_location(city, 1)[0]
+    #user with 0.8 (1 std dev above) - 3b355141-1488-4cbf-a4d0-70a706d1eb10
+    #User wit 0.625 (mean) threshold - b981f4d1-b649-4abb-b333-5d7dd69e8310
+    #user with 0.400 (1 std dv) - 2e6a8e21-6120-467e-8e83-46fb03400682
+    
+    user = retriever.retrieve_profile_by_id(input_parquet_path, "b981f4d1-b649-4abb-b333-5d7dd69e8310")
     print(user)
 
     #get list of profiles based on city and num
-    profiles = retriever.random_profile_chooser(user, input_parquet_path, num)
+    # profiles = retriever.random_profile_chooser(user, input_parquet_path, num)
 
     #make sure user not in profiles
-    while user in profiles:
-        user = retriever.retrieve_by_location(city, 1)[0]
+    # while user in profiles:
+    #     user = retriever.retrieve_by_location(city, 1)[0]
 
 
     ###################CSP_SETUP##########################
-    user_matches = {
-        "age_range": [],
-        "zodiac_pref": [],
-        "education_pref": [],
-        "tag_similarity" : []}
+    # user_matches = {
+    #     "age_range": [],
+    #     "zodiac_pref": [],
+    #     "education_pref": [],
+    #     "tag_similarity" : []}
 
-    # match with CSP
-    matches = csp.match_profiles(user, profiles.copy(), user_matches)
-    match_set = set() #storing the matches
+    # # match with CSP
+    # matches = csp.match_profiles(user, profiles.copy(), user_matches)
+    # match_set = set() #storing the matches
 
-    #collect CSP matches
-    for var, profs in matches.items():
-        for p in profs:
-            if p not in match_set:
-                match_set.add(p)
+    # #collect CSP matches
+    # for var, profs in matches.items():
+    #     for p in profs:
+    #         if p not in match_set:
+    #             match_set.add(p)
 
-    print("match set length:", len(match_set))
+    # print("match set length:", len(match_set))
 
 
     ############RUNNING_SIMULATION###################
-    rand_accepts, rand_rejects, rand_rt = simulation.simulation(user, profiles.copy())
-    print("random sim done")
-    csp_accepts, csp_rejects, csp_rt = simulation.simulation(user, list(match_set))
-    print("csp sim done")
-    print(user)
-    drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
+    # rand_accepts, rand_rejects, rand_rt = simulation.simulation(user, profiles.copy())
+    # print("random sim done")
+    # csp_accepts, csp_rejects, csp_rt = simulation.simulation(user, list(match_set))
+    # print("csp sim done")
+    # print(user)
+    # drl_accepts, drl_suggested, drl_rt = agent.unsupervised_learning(user, profiles.copy(), simulation)
 
 
-    print(user)
-    print("Accepts ", len(rand_accepts), "; Suggested ", num, "; Running Time ", sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
-    print("Accepts ", len((csp_accepts)), "; Suggested ", len(match_set) if len(match_set) > 0 else 0, "; Running Time ", sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
-    print("Accepts ", len(drl_accepts), "; Suggested ", len(drl_suggested), "; Running Time ", sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
+    # print(user)
+    # print("Accepts ", len(rand_accepts), "; Suggested ", num, "; Running Time ", sum(rand_rt)/len(rand_rt) if len(rand_rt) > 0 else None)
+    # print("Accepts ", len((csp_accepts)), "; Suggested ", len(match_set) if len(match_set) > 0 else 0, "; Running Time ", sum(csp_rt)/len(csp_rt) if len(csp_rt) > 0 else None)
+    # print("Accepts ", len(drl_accepts), "; Suggested ", len(drl_suggested), "; Running Time ", sum(drl_rt)/len(drl_rt) if len(drl_rt) > 0 else None)
 
-    agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
-    agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
+    # agent.visualize_q_values(agent.q_value_frames, 'q_value_visualization.gif')
+    # agent.save_loss_plot(agent.losses, 'learning_loss_plot.png')
