@@ -18,6 +18,7 @@ class CSP:
         self.variables = {}
         self.values = {}
     
+    #check for consistency based on the variable
     def isConsistent(self, user, var, var_constraints, potential_match): #checks if the preferences of user matches the characteristics of potential match
         if var == "age_range":
             return (abs(user.age - potential_match.age) <= var_constraints)

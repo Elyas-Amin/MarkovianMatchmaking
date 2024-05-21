@@ -248,7 +248,7 @@ class Retriever:
 #get lengths of each file
 # df = pd.read_parquet("houston_profiles.parquet")
 # print(len(df))
-# df = pd.read_parquet("new_york_profiles.parquet")
+# df = pd.read_parquet("new_york_profiles10000.parquet")
 # print(len(df))
 # df = pd.read_parquet("la_profiles.parquet")
 # print(len(df))
